@@ -229,6 +229,7 @@ pii_*.json
 # Configuration files that might contain sensitive info
 appsettings.Production.json
 appsettings.Staging.json
+appsettings.Local.json
 *.secrets.json
 secrets.json
 local.settings.json
