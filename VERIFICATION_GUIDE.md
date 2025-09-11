@@ -12,6 +12,62 @@ For reviewers who need to quickly verify this project works correctly:
 
 ---
 
+## ⚙️ **0. Setup Instructions** (1 minute)
+
+### **Prerequisites**
+- .NET 8.0 SDK installed
+- Optional: OpenAI API key for enhanced LLM extraction
+
+### **🔑 OpenAI API Key Configuration** (Optional but Recommended)
+
+The Signal Booster application can use OpenAI's API for enhanced physician note parsing. Without an API key, the application will fall back to regex-based parsing.
+
+#### **Step 1: Create Local Configuration File**
+```bash
+cd src
+cp appsettings.Local.json.template appsettings.Local.json
+```
+
+#### **Step 2: Add Your OpenAI API Key**
+1. **Get an OpenAI API Key**:
+   - Go to [OpenAI API Keys](https://platform.openai.com/api-keys)
+   - Create a new API key or use an existing one
+   - Copy the API key (starts with `sk-`)
+
+2. **Update the Configuration**:
+   ```bash
+   # Edit appsettings.Local.json
+   nano appsettings.Local.json  # or use your preferred editor
+   ```
+
+3. **Replace the Placeholder**:
+   ```json
+   {
+     "SignalBooster": {
+       "OpenAI": {
+         "ApiKey": "sk-your-actual-api-key-here"
+       }
+     }
+   }
+   ```
+
+#### **Step 3: Verify Configuration**
+```bash
+# The application will automatically use the local configuration
+dotnet run
+```
+
+**✅ Expected Behavior:**
+- **With API Key**: Enhanced LLM-powered extraction with higher accuracy
+- **Without API Key**: Fallback to regex parsing (still functional)
+
+**🔒 Security Notes:**
+- `appsettings.Local.json` is in `.gitignore` and won't be committed
+- Never commit real API keys to version control
+- The template file shows the expected structure without sensitive data
+
+---
+
 ## 🚀 **1. Build Verification** (2 minutes)
 
 ### **Step 1: Clean Build**
@@ -224,6 +280,7 @@ dotnet clean && dotnet restore && dotnet build
 ### **Issue: Missing OpenAI API Key**
 - ✅ **Expected**: App falls back to regex parsing automatically
 - ⚠️ **Warning**: LLM extraction will be skipped but app still works
+- 🔧 **Enhancement**: See "Setup Instructions" section above to configure OpenAI API for enhanced parsing
 
 ### **Issue: API Connection Failures**
 - ✅ **Expected**: `alert-api.com` is not a real endpoint

@@ -1,0 +1,7 @@
+{
+  "SignalBooster": {
+    "OpenAI": {
+      "ApiKey": "your-openai-api-key-here"
+    }
+  }
+}

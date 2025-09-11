@@ -18,6 +18,18 @@ A production-ready MVP for DME (Durable Medical Equipment) device order processi
 - .NET 8.0 SDK
 - Optional: OpenAI API key for enhanced LLM extraction
 
+### 🔑 OpenAI API Key Setup (Optional)
+For enhanced parsing accuracy, configure an OpenAI API key:
+```bash
+# Copy the template file
+cp src/appsettings.Local.json.template src/appsettings.Local.json
+
+# Edit and add your API key
+# Replace "your-openai-api-key-here" with your actual OpenAI API key
+```
+
+**Note**: Without an API key, the application automatically falls back to regex-based parsing.
+
 ### Installation & Usage
 ```bash
 # Clone and navigate to project

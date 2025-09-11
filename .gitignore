@@ -234,6 +234,9 @@ appsettings.Local.json
 secrets.json
 local.settings.json
 
+# Exception: Allow template files (safe to commit)
+!*.template
+
 # Database files
 *.db
 *.sqlite
