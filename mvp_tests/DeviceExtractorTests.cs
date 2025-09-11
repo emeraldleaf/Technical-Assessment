@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using SignalBooster.Mvp.Configuration;
@@ -13,6 +14,7 @@ public class DeviceExtractorTests
     private readonly ITextParser _textParser = Substitute.For<ITextParser>();
     private readonly IApiClient _apiClient = Substitute.For<IApiClient>();
     private readonly IOptions<SignalBoosterOptions> _options;
+    private readonly ILogger<DeviceExtractor> _logger = Substitute.For<ILogger<DeviceExtractor>>();
     private readonly DeviceExtractor _extractor;
 
     public DeviceExtractorTests()
@@ -23,7 +25,7 @@ public class DeviceExtractorTests
             OpenAI = new OpenAIOptions { ApiKey = "" } // No API key = use regex parser
         });
         
-        _extractor = new DeviceExtractor(_fileReader, _textParser, _apiClient, _options);
+        _extractor = new DeviceExtractor(_fileReader, _textParser, _apiClient, _options, _logger);
     }
 
     [Fact]
@@ -55,7 +57,7 @@ public class DeviceExtractorTests
             OpenAI = new OpenAIOptions { ApiKey = "test-key" }
         });
         
-        var extractorWithKey = new DeviceExtractor(_fileReader, _textParser, _apiClient, optionsWithKey);
+        var extractorWithKey = new DeviceExtractor(_fileReader, _textParser, _apiClient, optionsWithKey, _logger);
         
         var filePath = "test.txt";
         var noteText = "Patient needs CPAP.";

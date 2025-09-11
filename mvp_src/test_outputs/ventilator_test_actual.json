@@ -1,0 +1,12 @@
+{
+  "device": "Ventilator",
+  "liters": null,
+  "usage": null,
+  "diagnosis": "Chronic respiratory failure, ALS",
+  "ordering_provider": "Dr. Thompson",
+  "patient_name": "Michael Rodriguez",
+  "dob": "06/22/1956",
+  "mask_type": null,
+  "add_ons": null,
+  "qualifier": null
+}

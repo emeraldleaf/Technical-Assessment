@@ -54,13 +54,20 @@ public class TextParser : ITextParser
     {
         if (_openAIClient == null)
         {
-            _logger.LogInformation("Using fallback regex parser");
+            _logger.LogInformation("[{Class}.{Method}] OpenAI client not configured, using fallback regex parser",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync));
             return ParseDeviceOrder(noteText);
         }
 
         try
         {
-            _logger.LogInformation("Using OpenAI LLM for device order extraction");
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            _logger.LogInformation("[{Class}.{Method}] Step 1: Configuring OpenAI LLM extraction. Model: {Model}, MaxTokens: {MaxTokens}, Temperature: {Temperature}",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync), _options.Model, _options.MaxTokens, _options.Temperature);
+            
+            _logger.LogInformation("[{Class}.{Method}] Step 2: Creating structured extraction prompt for {NoteLength} character note",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync), noteText.Length);
             
             var prompt = CreateExtractionPrompt(noteText);
             
@@ -75,17 +82,32 @@ public class TextParser : ITextParser
                 Temperature = _options.Temperature
             };
 
+            _logger.LogInformation("[{Class}.{Method}] Step 3: Calling OpenAI API for device extraction",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync));
+
             var response = await _openAIClient.GetChatCompletionsAsync(chatCompletionsOptions);
             var content = response.Value.Choices[0].Message.Content;
+            
+            stopwatch.Stop();
+            
+            // Log OpenAI usage metrics
+            var usage = response.Value.Usage;
+            _logger.LogInformation("[{Class}.{Method}] Step 4: OpenAI API call completed. Duration: {DurationMs}ms, PromptTokens: {PromptTokens}, CompletionTokens: {CompletionTokens}, TotalTokens: {TotalTokens}",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync), stopwatch.ElapsedMilliseconds, usage?.PromptTokens ?? 0, usage?.CompletionTokens ?? 0, usage?.TotalTokens ?? 0);
+
+            _logger.LogInformation("[{Class}.{Method}] Step 5: Parsing LLM JSON response into DeviceOrder object",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync));
 
             var deviceOrder = ParseLlmResponse(content);
-            _logger.LogInformation("Successfully extracted device order using OpenAI");
+            _logger.LogInformation("[{Class}.{Method}] Step 6: Successfully extracted device order using OpenAI. Device: {DeviceType}, Patient: {PatientName}",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync), deviceOrder.Device, deviceOrder.PatientName);
             
             return deviceOrder;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to use OpenAI for extraction, falling back to regex parser");
+            _logger.LogError(ex, "[{Class}.{Method}] Step FAILED: OpenAI extraction failed, falling back to regex parser. Error: {ErrorMessage}",
+                nameof(TextParser), nameof(ParseDeviceOrderAsync), ex.Message);
             return ParseDeviceOrder(noteText);
         }
     }
@@ -98,13 +120,13 @@ Physician Note:
 {noteText}
 
 Return ONLY a JSON object with these fields (omit null/empty fields):
-- device: Device type (""CPAP"", ""Oxygen Tank"", ""Wheelchair"", etc.)
+- device: Device type (""CPAP"", ""Oxygen Tank"", ""Wheelchair"", ""Hospital Bed"", ""Ventilator"", ""TENS Unit"", ""Commode"", ""Blood Glucose Monitor"", etc.)
 - patient_name, dob, diagnosis, ordering_provider
 - liters: For oxygen (""2 L"")
 - usage: When used (""sleep and exertion"")
 - mask_type: For CPAP (""full face"")
-- add_ons: Array of features ([""humidifier""])
-- qualifier: Medical qualifiers (""AHI > 20"")
+- add_ons: Array of features ([""humidifier"", ""side rails"", ""pressure relief""])
+- qualifier: Medical qualifiers (""AHI > 20"", ""pressure sore risk"", ""diabetes management"")
 
 Return valid JSON only.";
     }
@@ -180,6 +202,71 @@ Return valid JSON only.";
         
         if (text.Contains("nebulizer", StringComparison.OrdinalIgnoreCase))
             return "Nebulizer";
+        
+        // Hospital bed and mattress
+        if (text.Contains("hospital bed", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("adjustable bed", StringComparison.OrdinalIgnoreCase))
+            return "Hospital Bed";
+        
+        if (text.Contains("mattress", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("pressure relieving", StringComparison.OrdinalIgnoreCase))
+            return "Pressure Relief Mattress";
+        
+        // Mobility devices
+        if (text.Contains("crutches", StringComparison.OrdinalIgnoreCase))
+            return "Crutches";
+        
+        if (text.Contains("cane", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("walking stick", StringComparison.OrdinalIgnoreCase))
+            return "Cane";
+        
+        if (text.Contains("scooter", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("mobility scooter", StringComparison.OrdinalIgnoreCase))
+            return "Mobility Scooter";
+        
+        // Respiratory devices
+        if (text.Contains("suction", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("aspirator", StringComparison.OrdinalIgnoreCase))
+            return "Suction Machine";
+        
+        if (text.Contains("ventilator", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("respirator", StringComparison.OrdinalIgnoreCase))
+            return "Ventilator";
+        
+        if (text.Contains("pulse oximeter", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("oxygen monitor", StringComparison.OrdinalIgnoreCase))
+            return "Pulse Oximeter";
+        
+        // Therapy devices
+        if (text.Contains("tens", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("electrical stimulation", StringComparison.OrdinalIgnoreCase))
+            return "TENS Unit";
+        
+        if (text.Contains("compression pump", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("lymphedema pump", StringComparison.OrdinalIgnoreCase))
+            return "Compression Pump";
+        
+        // Bathroom safety
+        if (text.Contains("commode", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("bedside toilet", StringComparison.OrdinalIgnoreCase))
+            return "Commode";
+        
+        if (text.Contains("shower chair", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("bath bench", StringComparison.OrdinalIgnoreCase))
+            return "Shower Chair";
+        
+        if (text.Contains("toilet seat", StringComparison.OrdinalIgnoreCase) && 
+            text.Contains("raised", StringComparison.OrdinalIgnoreCase))
+            return "Raised Toilet Seat";
+        
+        // Monitoring devices
+        if (text.Contains("blood glucose", StringComparison.OrdinalIgnoreCase) || 
+            text.Contains("glucometer", StringComparison.OrdinalIgnoreCase))
+            return "Blood Glucose Monitor";
+        
+        if (text.Contains("blood pressure", StringComparison.OrdinalIgnoreCase) && 
+            text.Contains("monitor", StringComparison.OrdinalIgnoreCase))
+            return "Blood Pressure Monitor";
         
         return "Unknown";
     }

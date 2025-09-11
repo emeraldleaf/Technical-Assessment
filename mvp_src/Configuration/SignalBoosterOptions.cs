@@ -21,6 +21,10 @@ public class FileOptions
 {
     public string DefaultInputPath { get; set; } = "physician_note.txt";
     public string[] SupportedExtensions { get; set; } = { ".txt", ".json" };
+    public bool BatchProcessingMode { get; set; } = false;
+    public string BatchInputDirectory { get; set; } = "test_notes";
+    public string BatchOutputDirectory { get; set; } = "test_outputs";
+    public bool CleanupActualFiles { get; set; } = true;
 }
 
 public class OpenAIOptions

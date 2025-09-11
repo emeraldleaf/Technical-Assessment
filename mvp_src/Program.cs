@@ -45,26 +45,47 @@ class Program
             var extractor = host.Services.GetRequiredService<DeviceExtractor>();
             var options = host.Services.GetRequiredService<IOptions<SignalBoosterOptions>>().Value;
             
-            // Use configuration for default file path
-            var filePath = args.Length > 0 ? args[0] : options.Files.DefaultInputPath;
-            
-            logger.LogInformation("Processing physician note: {FilePath} with LLM integration: {HasOpenAI}", 
-                filePath, !string.IsNullOrEmpty(options.OpenAI.ApiKey));
-            
-            var deviceOrder = await extractor.ProcessNoteAsync(filePath);
-            
-            var outputObject = CreateOutputObject(deviceOrder);
-            var output = JsonSerializer.Serialize(outputObject, new JsonSerializerOptions
+            // Check if batch processing mode is enabled
+            if (options.Files.BatchProcessingMode)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-                WriteIndented = true
-            });
-            
-            Console.WriteLine("Device order extracted:");
-            Console.WriteLine(output);
-            
-            await File.WriteAllTextAsync("output.json", output);
-            logger.LogInformation("Output saved to output.json");
+                logger.LogInformation("Batch processing mode enabled. Processing all files in {InputDirectory} with LLM integration: {HasOpenAI}", 
+                    options.Files.BatchInputDirectory, !string.IsNullOrEmpty(options.OpenAI.ApiKey));
+                
+                var batchResults = await extractor.ProcessAllNotesAsync();
+                
+                Console.WriteLine($"Batch processing completed:");
+                Console.WriteLine($"Successfully processed {batchResults.Count} files");
+                
+                foreach (var (fileName, result) in batchResults)
+                {
+                    Console.WriteLine($"  ✓ {fileName} → {result.Device} for {result.PatientName}");
+                }
+                
+                logger.LogInformation("Batch processing completed. Processed {ProcessedCount} files successfully", batchResults.Count);
+            }
+            else
+            {
+                // Single file processing mode (existing behavior)
+                var filePath = args.Length > 0 ? args[0] : options.Files.DefaultInputPath;
+                
+                logger.LogInformation("Processing physician note: {FilePath} with LLM integration: {HasOpenAI}", 
+                    filePath, !string.IsNullOrEmpty(options.OpenAI.ApiKey));
+                
+                var deviceOrder = await extractor.ProcessNoteAsync(filePath);
+                
+                var outputObject = CreateOutputObject(deviceOrder);
+                var output = JsonSerializer.Serialize(outputObject, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                    WriteIndented = true
+                });
+                
+                Console.WriteLine("Device order extracted:");
+                Console.WriteLine(output);
+                
+                await File.WriteAllTextAsync("output.json", output);
+                logger.LogInformation("Output saved to output.json");
+            }
             
             Log.Information("Processing completed successfully");
             return 0;

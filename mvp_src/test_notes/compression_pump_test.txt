@@ -1,0 +1,8 @@
+Patient Name: Linda Thompson
+DOB: 02/14/1971
+Diagnosis: Lymphedema, chronic venous insufficiency
+Ordering Physician: Dr. Lee
+
+Patient requires compression pump for lymphedema management.
+Bilateral lower extremity swelling, pitting edema present.
+Pump therapy needed 2-3 times daily for 45-60 minutes.
