@@ -1,16 +1,12 @@
 {
   "device": "CPAP",
   "liters": null,
-  "usage": "sleep and exertion",
-  "diagnosis": "Sleep Apnea",
+  "usage": null,
+  "diagnosis": "Unknown",
   "ordering_provider": "Dr. Smith",
-  "patient_name": "Patient Name",
-  "dob": "Patient Date of Birth",
-  "mask_type": "full face",
-  "add_ons": [
-    "humidifier",
-    "side rails",
-    "pressure relief"
-  ],
+  "patient_name": "Unknown",
+  "dob": "Unknown",
+  "mask_type": null,
+  "add_ons": null,
   "qualifier": null
 }

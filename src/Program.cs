@@ -201,7 +201,10 @@ class Program
                 var appInsightsConnectionString = configuration.GetValue<string>("ApplicationInsights:ConnectionString");
                 if (!string.IsNullOrEmpty(appInsightsConnectionString))
                 {
-                    services.AddApplicationInsightsTelemetry(appInsightsConnectionString);
+                    services.AddApplicationInsightsTelemetry(options =>
+                    {
+                        options.ConnectionString = appInsightsConnectionString;
+                    });
                 }
             })
             .UseSerilog() // Replace default logging with Serilog

@@ -1,7 +1,7 @@
 {
   "device": "Blood Glucose Monitor",
   "liters": null,
-  "usage": "daily diabetes management",
+  "usage": null,
   "diagnosis": "Type 1 Diabetes Mellitus",
   "ordering_provider": "Dr. Williams",
   "patient_name": "Sarah Johnson",

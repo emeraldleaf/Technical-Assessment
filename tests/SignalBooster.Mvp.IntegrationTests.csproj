@@ -20,6 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
@@ -28,13 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="SignalBooster.Mvp.csproj" />
+    <ProjectReference Include="../src/SignalBooster.Mvp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="test_notes\**\*" CopyToOutputDirectory="PreserveNewest" />
     <None Include="test_outputs\**\*" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="appsettings.Test.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

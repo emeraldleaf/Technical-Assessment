@@ -81,7 +81,7 @@ dotnet build SignalBooster.Mvp.csproj --configuration Release
 **✅ Expected Result:**
 ```
 Build succeeded.
-    0 Warning(s)
+    0 Warning(s) [after Application Insights fix]
     0 Error(s)
 ```
 
@@ -157,7 +157,18 @@ dotnet test SignalBooster.Mvp.Tests.csproj --configuration Release --verbosity m
 Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11
 ```
 
-### **Step 2: Integration Testing**
+### **Step 2: Integration Tests**
+```bash
+# Run integration tests
+dotnet test SignalBooster.Mvp.IntegrationTests.csproj --configuration Release --verbosity minimal
+```
+
+**✅ Expected Result:**
+```
+Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11
+```
+
+### **Step 3: Integration Testing (Alternative)**
 ```bash
 # Run integration tests (batch processing)
 ./run-integration-tests.sh --batch-only
