@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../mvp_src/SignalBooster.Mvp.csproj" />
+    <ProjectReference Include="../src/SignalBooster.Mvp.csproj" />
   </ItemGroup>
 
 </Project>

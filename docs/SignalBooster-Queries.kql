@@ -1,0 +1,461 @@
+// SignalBooster MVP - Application Insights KQL Queries
+// =====================================================
+// 
+// Comprehensive monitoring and observability queries for the DME device order processing platform
+// These queries provide insights into performance, errors, business metrics, and operational health
+//
+// Usage: Copy these queries into Application Insights Log Analytics workspace
+// Time Range: Adjust timerange filter as needed (last 24h, 7d, 30d)
+//
+// Query Categories:
+// 1. 🚀 Performance Monitoring
+// 2. 🚨 Error Analysis & Alerting  
+// 3. 📊 Business Intelligence & Analytics
+// 4. 🔍 Operational Health & Diagnostics
+// 5. 🤖 LLM Integration Monitoring
+// 6. 📈 Trend Analysis & Forecasting
+
+// =====================================================
+// 🚀 PERFORMANCE MONITORING
+// =====================================================
+
+// Processing Performance Overview
+// Tracks end-to-end processing times and identifies performance bottlenecks
+traces
+| where timestamp > ago(24h)
+| where message contains "Processing completed successfully"
+| extend CorrelationId = tostring(customDimensions.CorrelationId)
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| extend FilePath = tostring(customDimensions.FilePath)
+| extend ProcessingMode = tostring(customDimensions.UseOpenAI)
+| project timestamp, CorrelationId, Duration, FilePath, ProcessingMode
+| summarize 
+    AvgDuration = avg(Duration),
+    P50Duration = percentile(Duration, 50),
+    P95Duration = percentile(Duration, 95),
+    P99Duration = percentile(Duration, 99),
+    MaxDuration = max(Duration),
+    RequestCount = count()
+    by ProcessingMode
+| order by ProcessingMode
+
+// Performance Trend Analysis (Hourly)
+// Monitors processing performance trends over time to identify degradation
+traces
+| where timestamp > ago(7d)
+| where message contains "Processing completed successfully"
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| extend ProcessingMode = iff(tobool(customDimensions.UseOpenAI), "LLM", "Regex")
+| summarize 
+    AvgDuration = avg(Duration),
+    P95Duration = percentile(Duration, 95),
+    RequestCount = count()
+    by bin(timestamp, 1h), ProcessingMode
+| render timechart title="Processing Performance Trends (Hourly)"
+
+// Slowest Processing Operations (Top 10)
+// Identifies the slowest processing operations for optimization
+traces
+| where timestamp > ago(24h)
+| where message contains "Processing completed successfully"
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| extend FilePath = tostring(customDimensions.FilePath)
+| extend CorrelationId = tostring(customDimensions.CorrelationId)
+| top 10 by Duration desc
+| project timestamp, Duration, FilePath, CorrelationId
+| render table
+
+// Batch Processing Performance
+// Monitors batch processing operations and file throughput
+traces
+| where timestamp > ago(24h)
+| where message contains "Batch processing completed"
+| extend ProcessedCount = toint(customDimensions.ProcessedCount)
+| extend TotalCount = toint(customDimensions.TotalCount)
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| extend ThroughputPerMin = (ProcessedCount * 60000) / Duration
+| project timestamp, ProcessedCount, TotalCount, Duration, ThroughputPerMin
+| render table
+
+// =====================================================
+// 🚨 ERROR ANALYSIS & ALERTING
+// =====================================================
+
+// Error Rate Monitoring
+// Tracks error rates and failure patterns for alerting
+traces
+| where timestamp > ago(24h)
+| where severityLevel >= 3 // Warning and above
+| summarize 
+    ErrorCount = countif(severityLevel == 4), // Error
+    WarningCount = countif(severityLevel == 3), // Warning
+    TotalEvents = count()
+    by bin(timestamp, 10m)
+| extend ErrorRate = (ErrorCount * 100.0) / TotalEvents
+| render timechart title="Error Rate Monitoring (10min intervals)"
+
+// Critical Errors Analysis
+// Detailed analysis of critical errors for immediate attention
+traces
+| where timestamp > ago(24h)
+| where severityLevel == 4 // Error level
+| extend ErrorType = case(
+    message contains "OpenAI", "LLM_Error",
+    message contains "FileReader", "File_IO_Error", 
+    message contains "ApiClient", "API_Error",
+    message contains "TextParser", "Parsing_Error",
+    "Unknown_Error"
+)
+| extend CorrelationId = tostring(customDimensions.CorrelationId)
+| extend FilePath = tostring(customDimensions.FilePath)
+| summarize 
+    ErrorCount = count(),
+    LastError = max(timestamp),
+    SampleMessage = any(message)
+    by ErrorType
+| order by ErrorCount desc
+
+// LLM Fallback Monitoring
+// Tracks when LLM processing fails and fallback to regex is used
+traces
+| where timestamp > ago(24h)
+| where message contains "Falling back to regex parsing"
+| extend CorrelationId = tostring(customDimensions.CorrelationId)
+| extend Reason = tostring(customDimensions.Reason)
+| summarize FallbackCount = count() by bin(timestamp, 1h), Reason
+| render columnchart title="LLM Fallback Incidents by Hour"
+
+// Processing Failures by File Type
+// Identifies which file types are causing the most processing failures
+traces
+| where timestamp > ago(24h)
+| where severityLevel >= 3
+| extend FilePath = tostring(customDimensions.FilePath)
+| extend FileExtension = extract(@"\.([^.]+)$", 1, FilePath)
+| where isnotempty(FileExtension)
+| summarize FailureCount = count() by FileExtension
+| render piechart title="Processing Failures by File Type"
+
+// =====================================================
+// 📊 BUSINESS INTELLIGENCE & ANALYTICS
+// =====================================================
+
+// Device Type Distribution
+// Analytics on most frequently processed DME device types
+traces
+| where timestamp > ago(7d)
+| where message contains "Device order extracted successfully"
+| extend Device = tostring(customDimensions.Device)
+| extend Patient = tostring(customDimensions.PatientName)
+| extend Provider = tostring(customDimensions.Provider)
+| where isnotempty(Device)
+| summarize 
+    OrderCount = count(),
+    UniquePatients = dcount(Patient),
+    UniqueProviders = dcount(Provider)
+    by Device
+| order by OrderCount desc
+| render columnchart title="DME Device Order Distribution (Last 7 Days)"
+
+// Provider Analytics
+// Analysis of ordering provider patterns and volume
+traces
+| where timestamp > ago(30d)
+| where message contains "Device order extracted successfully"
+| extend Provider = tostring(customDimensions.Provider)
+| extend Device = tostring(customDimensions.Device)
+| where isnotempty(Provider)
+| summarize 
+    TotalOrders = count(),
+    UniqueDevices = dcount(Device),
+    LastOrder = max(timestamp)
+    by Provider
+| top 20 by TotalOrders desc
+| render table
+
+// Processing Volume Trends
+// Daily processing volume trends for capacity planning
+traces
+| where timestamp > ago(30d)
+| where message contains "Device order extracted successfully"
+| extend ProcessingMode = iff(tobool(customDimensions.UseOpenAI), "LLM", "Regex")
+| summarize 
+    TotalOrders = count(),
+    LLMOrders = countif(ProcessingMode == "LLM"),
+    RegexOrders = countif(ProcessingMode == "Regex")
+    by bin(timestamp, 1d)
+| extend LLMPercentage = (LLMOrders * 100.0) / TotalOrders
+| render timechart title="Daily Processing Volume and LLM Usage"
+
+// Geographic Distribution (if available)
+// Patient location analytics for service area planning
+traces
+| where timestamp > ago(30d)
+| where message contains "Device order extracted successfully"
+| extend Patient = tostring(customDimensions.PatientName)
+| extend Device = tostring(customDimensions.Device)
+| where isnotempty(Patient)
+// Note: Add location extraction logic based on patient data format
+| summarize OrderCount = count() by Device
+| render piechart title="Device Distribution Analysis"
+
+// =====================================================
+// 🔍 OPERATIONAL HEALTH & DIAGNOSTICS
+// =====================================================
+
+// Application Health Dashboard
+// Overall application health and availability metrics
+traces
+| where timestamp > ago(1h)
+| summarize 
+    TotalRequests = count(),
+    SuccessfulRequests = countif(message contains "Processing completed successfully"),
+    FailedRequests = countif(severityLevel >= 4),
+    LLMRequests = countif(tobool(customDimensions.UseOpenAI)),
+    RegexRequests = countif(not(tobool(customDimensions.UseOpenAI)))
+| extend 
+    SuccessRate = (SuccessfulRequests * 100.0) / TotalRequests,
+    LLMUsageRate = (LLMRequests * 100.0) / TotalRequests
+| project TotalRequests, SuccessRate, LLMUsageRate, FailedRequests
+
+// Correlation ID Tracking
+// End-to-end request tracing for debugging
+traces
+| where timestamp > ago(24h)
+| where customDimensions.CorrelationId == "YOUR_CORRELATION_ID" // Replace with actual ID
+| project timestamp, severityLevel, message, customDimensions
+| order by timestamp asc
+
+// Configuration Monitoring
+// Tracks configuration changes and their impact
+traces
+| where timestamp > ago(24h)
+| where message contains "configuration" or message contains "setting"
+| extend ConfigType = case(
+    message contains "OpenAI", "LLM_Config",
+    message contains "Batch", "Batch_Config",
+    message contains "API", "API_Config",
+    "General_Config"
+)
+| summarize EventCount = count() by ConfigType, bin(timestamp, 1h)
+| render columnchart title="Configuration Events by Type"
+
+// Memory and Resource Usage (if available)
+// Monitor resource consumption patterns
+traces
+| where timestamp > ago(24h)
+| where message contains "Step 1: Starting"
+| extend NoteLength = toint(customDimensions.NoteLength)
+| where isnotnull(NoteLength)
+| summarize 
+    AvgNoteLength = avg(NoteLength),
+    MaxNoteLength = max(NoteLength),
+    RequestCount = count()
+    by bin(timestamp, 1h)
+| render timechart title="Note Length Trends (Proxy for Memory Usage)"
+
+// =====================================================
+// 🤖 LLM INTEGRATION MONITORING
+// =====================================================
+
+// OpenAI API Performance
+// Monitors OpenAI API response times and token usage
+traces
+| where timestamp > ago(24h)
+| where message contains "OpenAI API call completed"
+| extend Duration = toint(customDimensions.DurationMs)
+| extend PromptTokens = toint(customDimensions.PromptTokens)
+| extend CompletionTokens = toint(customDimensions.CompletionTokens)
+| extend TotalTokens = toint(customDimensions.TotalTokens)
+| summarize 
+    AvgDuration = avg(Duration),
+    P95Duration = percentile(Duration, 95),
+    AvgPromptTokens = avg(PromptTokens),
+    AvgCompletionTokens = avg(CompletionTokens),
+    TotalApiCalls = count(),
+    TotalTokensUsed = sum(TotalTokens)
+    by bin(timestamp, 1h)
+| render timechart title="OpenAI API Performance Metrics"
+
+// LLM vs Regex Accuracy Comparison
+// Compare processing outcomes between LLM and regex methods
+traces
+| where timestamp > ago(7d)
+| where message contains "Device order extracted successfully"
+| extend ProcessingMode = iff(tobool(customDimensions.UseOpenAI), "LLM", "Regex")
+| extend Device = tostring(customDimensions.Device)
+| extend HasPatientName = isnotempty(tostring(customDimensions.PatientName))
+| extend HasDiagnosis = isnotempty(tostring(customDimensions.Diagnosis))
+| summarize 
+    TotalExtractions = count(),
+    WithPatientName = countif(HasPatientName),
+    WithDiagnosis = countif(HasDiagnosis),
+    UniqueDevices = dcount(Device)
+    by ProcessingMode
+| extend 
+    PatientNameRate = (WithPatientName * 100.0) / TotalExtractions,
+    DiagnosisRate = (WithDiagnosis * 100.0) / TotalExtractions
+
+// Token Cost Analysis
+// Estimate OpenAI API costs based on token usage
+traces
+| where timestamp > ago(30d)
+| where message contains "OpenAI API call completed"
+| extend TotalTokens = toint(customDimensions.TotalTokens)
+| extend Model = tostring(customDimensions.Model)
+| summarize 
+    TotalTokensUsed = sum(TotalTokens),
+    ApiCalls = count()
+    by bin(timestamp, 1d), Model
+| extend EstimatedCost = case(
+    Model == "gpt-3.5-turbo", TotalTokensUsed * 0.002 / 1000, // $0.002 per 1K tokens
+    Model == "gpt-4", TotalTokensUsed * 0.03 / 1000,          // $0.03 per 1K tokens
+    TotalTokensUsed * 0.002 / 1000                            // Default pricing
+)
+| render timechart title="Daily OpenAI API Cost Estimation"
+
+// =====================================================
+// 📈 TREND ANALYSIS & FORECASTING
+// =====================================================
+
+// Weekly Processing Patterns
+// Identify peak processing times for resource planning
+traces
+| where timestamp > ago(30d)
+| where message contains "Device order extracted successfully"
+| extend DayOfWeek = dayofweek(timestamp)
+| extend HourOfDay = hourofday(timestamp)
+| summarize RequestCount = count() by DayOfWeek, HourOfDay
+| render heatmap title="Processing Volume Heatmap (Day vs Hour)"
+
+// Growth Trend Analysis
+// Monitor application usage growth patterns
+traces
+| where timestamp > ago(90d)
+| where message contains "Device order extracted successfully"
+| summarize DailyOrders = count() by bin(timestamp, 1d)
+| extend MovingAvg7Day = series_fir(DailyOrders, repeat(1, 7), true, false)
+| render timechart title="Daily Orders with 7-Day Moving Average"
+
+// Capacity Planning Metrics
+// Forecast future resource requirements
+traces
+| where timestamp > ago(30d)
+| where message contains "Processing completed successfully"
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| summarize 
+    DailyRequests = count(),
+    AvgDuration = avg(Duration),
+    TotalProcessingTime = sum(Duration)
+    by bin(timestamp, 1d)
+| extend ResourceUtilization = TotalProcessingTime / (24 * 60 * 60 * 1000) // Percentage of day used
+| render timechart title="Daily Resource Utilization Trends"
+
+// =====================================================
+// 🚨 ALERTING QUERIES (For Azure Monitor Alerts)
+// =====================================================
+
+// High Error Rate Alert
+// Trigger when error rate exceeds 5% in 15 minutes
+traces
+| where timestamp > ago(15m)
+| summarize 
+    TotalRequests = count(),
+    ErrorRequests = countif(severityLevel >= 4)
+| extend ErrorRate = (ErrorRequests * 100.0) / TotalRequests
+| where ErrorRate > 5.0
+| project ErrorRate, TotalRequests, ErrorRequests
+
+// OpenAI API Failure Alert  
+// Trigger when OpenAI API failures exceed threshold
+traces
+| where timestamp > ago(10m)
+| where message contains "OpenAI" and severityLevel >= 4
+| summarize FailureCount = count()
+| where FailureCount > 3
+
+// Processing Performance Degradation Alert
+// Trigger when P95 processing time exceeds 10 seconds
+traces
+| where timestamp > ago(20m)
+| where message contains "Processing completed successfully"
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| summarize P95Duration = percentile(Duration, 95)
+| where P95Duration > 10000 // 10 seconds
+
+// Low Processing Volume Alert
+// Trigger when processing volume drops significantly
+traces
+| where timestamp > ago(1h)
+| where message contains "Device order extracted successfully"
+| summarize RequestCount = count()
+| where RequestCount < 10 // Adjust threshold based on expected volume
+
+// =====================================================
+// 📊 CUSTOM DASHBOARDS QUERIES
+// =====================================================
+
+// Executive Summary Dashboard
+traces
+| where timestamp > ago(24h)
+| summarize 
+    ['Total Orders Processed'] = countif(message contains "Device order extracted successfully"),
+    ['Success Rate %'] = round((countif(message contains "Processing completed successfully") * 100.0) / count(), 2),
+    ['LLM Usage %'] = round((countif(tobool(customDimensions.UseOpenAI)) * 100.0) / count(), 2),
+    ['Avg Processing Time (ms)'] = round(avgif(toint(customDimensions.TotalDurationMs), message contains "Processing completed successfully"), 0),
+    ['Critical Errors'] = countif(severityLevel == 4)
+
+// Real-time Operations Dashboard  
+traces
+| where timestamp > ago(5m)
+| where message contains "Processing completed successfully"
+| extend Duration = toint(customDimensions.TotalDurationMs)
+| extend Device = tostring(customDimensions.Device)
+| project timestamp, Duration, Device
+| order by timestamp desc
+| take 20
+
+// =====================================================
+// 💡 USAGE EXAMPLES
+// =====================================================
+
+/*
+Example Usage Scenarios:
+
+1. Performance Investigation:
+   - Use "Processing Performance Overview" to identify slow operations
+   - Use "Slowest Processing Operations" to find specific bottlenecks
+   - Use "Performance Trend Analysis" to spot degradation over time
+
+2. Error Troubleshooting:
+   - Use "Critical Errors Analysis" to identify error patterns
+   - Use "Correlation ID Tracking" to trace specific failed requests
+   - Use "LLM Fallback Monitoring" to understand LLM reliability
+
+3. Business Analytics:
+   - Use "Device Type Distribution" for product insights
+   - Use "Provider Analytics" for customer analysis
+   - Use "Processing Volume Trends" for capacity planning
+
+4. Operational Monitoring:
+   - Use "Application Health Dashboard" for real-time status
+   - Use alert queries for proactive monitoring
+   - Use "Resource Usage" queries for optimization
+
+5. Cost Optimization:
+   - Use "Token Cost Analysis" to monitor LLM expenses
+   - Use "LLM vs Regex Accuracy" to optimize processing strategies
+   - Use capacity planning queries for resource allocation
+
+To create alerts:
+1. Navigate to Azure Monitor > Alerts > New Alert Rule
+2. Select your Application Insights resource
+3. Use the alerting queries provided above
+4. Configure alert logic and action groups
+
+For dashboards:
+1. Create new Azure Dashboard or Workbook
+2. Add Log Analytics tiles using the dashboard queries
+3. Set appropriate time ranges and refresh intervals
+4. Share with operations and development teams
+*/
