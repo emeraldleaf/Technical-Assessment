@@ -2,11 +2,11 @@ using System.Text.RegularExpressions;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SignalBooster.Mvp.Configuration;
-using SignalBooster.Mvp.Models;
+using SignalBooster.Configuration;
+using SignalBooster.Models;
 using System.Text.Json;
 
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 public class TextParser : ITextParser
 {

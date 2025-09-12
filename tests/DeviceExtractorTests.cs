@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using SignalBooster.Mvp.Configuration;
-using SignalBooster.Mvp.Models;
-using SignalBooster.Mvp.Services;
+using SignalBooster.Configuration;
+using SignalBooster.Models;
+using SignalBooster.Services;
 using Xunit;
 
-namespace SignalBooster.Mvp.Tests;
+namespace SignalBooster.Tests;
 
 public class DeviceExtractorTests
 {

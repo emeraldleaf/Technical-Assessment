@@ -1,4 +1,4 @@
-namespace SignalBooster.Mvp.Configuration;
+namespace SignalBooster.Configuration;
 
 /// <summary>
 /// Root configuration class implementing Options Pattern

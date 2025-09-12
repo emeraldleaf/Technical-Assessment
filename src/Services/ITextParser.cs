@@ -1,6 +1,6 @@
-using SignalBooster.Mvp.Models;
+using SignalBooster.Models;
 
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 public interface ITextParser
 {

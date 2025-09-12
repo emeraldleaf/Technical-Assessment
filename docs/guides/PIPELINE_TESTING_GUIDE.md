@@ -19,13 +19,13 @@ ls -la test_notes/ test_outputs/ | head -20
 ```bash
 cd src
 # Restore dependencies
-dotnet restore SignalBooster.Mvp.csproj
+dotnet restore SignalBooster.csproj
 
 # Build application
-dotnet build SignalBooster.Mvp.csproj --configuration Release --no-restore
+dotnet build SignalBooster.csproj --configuration Release --no-restore
 
 # Publish application  
-dotnet publish SignalBooster.Mvp.csproj \
+dotnet publish SignalBooster.csproj \
   --configuration Release \
   --output ./publish \
   --self-contained false
@@ -41,7 +41,7 @@ chmod +x run-integration-tests.sh
 #### **Test Coverage**
 ```bash
 cd tests
-dotnet test SignalBooster.Mvp.Tests.csproj \
+dotnet test SignalBooster.Tests.csproj \
   --collect:"XPlat Code Coverage" \
   --results-directory ./coverage \
   --verbosity minimal
@@ -130,7 +130,7 @@ echo "✅ Expected files: $EXPECTED"
 # Test 2: Build Validation
 echo "🔨 Test 2: Build Validation"
 cd ../src
-dotnet build SignalBooster.Mvp.csproj --configuration Release
+dotnet build SignalBooster.csproj --configuration Release
 if [ $? -eq 0 ]; then
     echo "✅ Build: SUCCESS"
 else
@@ -152,8 +152,8 @@ fi
 # Test 4: Publish Validation
 echo "📦 Test 4: Publish Validation"
 cd ../src
-dotnet publish SignalBooster.Mvp.csproj --configuration Release --output ./publish --self-contained false > /dev/null
-if [ -f "./publish/SignalBooster.Mvp.dll" ]; then
+dotnet publish SignalBooster.csproj --configuration Release --output ./publish --self-contained false > /dev/null
+if [ -f "./publish/SignalBooster.dll" ]; then
     echo "✅ Publish: SUCCESS"
 else
     echo "❌ Publish: FAILED"
@@ -199,9 +199,9 @@ gh api repos/:owner/:repo/actions/workflows/:workflow_id/check
 After running tests, verify these artifacts are created:
 
 #### **Build Artifacts**
-- `src/bin/Release/net8.0/SignalBooster.Mvp.dll`
-- `src/publish/SignalBooster.Mvp.dll`
-- `src/publish/SignalBooster.Mvp.deps.json`
+- `src/bin/Release/net8.0/SignalBooster.dll`
+- `src/publish/SignalBooster.dll`
+- `src/publish/SignalBooster.deps.json`
 
 #### **Test Artifacts** 
 - `tests/test-report.md`
@@ -217,7 +217,7 @@ ls -la tests/test-report.md
 ls -la tests/test_outputs/*_actual.json
 
 # Verify publish artifacts
-ls -la src/publish/SignalBooster.Mvp.*
+ls -la src/publish/SignalBooster.*
 ```
 
 ---

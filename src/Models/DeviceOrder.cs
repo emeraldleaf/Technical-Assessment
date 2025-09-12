@@ -1,4 +1,4 @@
-namespace SignalBooster.Mvp.Models;
+namespace SignalBooster.Models;
 
 /// <summary>
 /// Domain model representing a DME (Durable Medical Equipment) device order.

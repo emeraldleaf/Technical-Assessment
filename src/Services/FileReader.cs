@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 public class FileReader : IFileReader
 {

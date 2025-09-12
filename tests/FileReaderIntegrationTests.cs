@@ -1,7 +1,7 @@
-using SignalBooster.Mvp.Services;
+using SignalBooster.Services;
 using Xunit;
 
-namespace SignalBooster.Mvp.Tests;
+namespace SignalBooster.Tests;
 
 public class FileReaderIntegrationTests
 {

@@ -73,9 +73,9 @@ dotnet run
 ### **Step 1: Clean Build**
 ```bash
 cd src
-dotnet clean SignalBooster.Mvp.csproj
-dotnet restore SignalBooster.Mvp.csproj
-dotnet build SignalBooster.Mvp.csproj --configuration Release
+dotnet clean SignalBooster.csproj
+dotnet restore SignalBooster.csproj
+dotnet build SignalBooster.csproj --configuration Release
 ```
 
 **✅ Expected Result:**
@@ -88,7 +88,7 @@ Build succeeded.
 ### **Step 2: Test Build** 
 ```bash
 cd ../tests
-dotnet build SignalBooster.Mvp.Tests.csproj --configuration Release
+dotnet build SignalBooster.Tests.csproj --configuration Release
 ```
 
 **✅ Expected Result:**
@@ -149,7 +149,7 @@ cat output.json
 ### **Step 1: Unit Tests**
 ```bash
 cd tests
-dotnet test SignalBooster.Mvp.Tests.csproj --configuration Release --verbosity minimal
+dotnet test SignalBooster.Tests.csproj --configuration Release --verbosity minimal
 ```
 
 **✅ Expected Result:**
@@ -160,7 +160,7 @@ Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11
 ### **Step 2: Integration Tests**
 ```bash
 # Run integration tests
-dotnet test SignalBooster.Mvp.IntegrationTests.csproj --configuration Release --verbosity minimal
+dotnet test SignalBooster.IntegrationTests.csproj --configuration Release --verbosity minimal
 ```
 
 **✅ Expected Result:**

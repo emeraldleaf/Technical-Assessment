@@ -7,11 +7,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
-using SignalBooster.Mvp.Configuration;
-using SignalBooster.Mvp.Models;
-using SignalBooster.Mvp.Services;
+using SignalBooster.Configuration;
+using SignalBooster.Models;
+using SignalBooster.Services;
 
-namespace SignalBooster.Mvp;
+namespace SignalBooster;
 
 /// <summary>
 /// SignalBooster MVP - DME (Durable Medical Equipment) Processing Application

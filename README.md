@@ -94,7 +94,12 @@ Built with clear separation of concerns and logical organization (note: this is 
 ../tests/
 ├── test_notes/              # Comprehensive test data  
 ├── test_outputs/            # Golden master test results
-├── run-integration-tests.sh # Test automation script
+├── run-integration-tests.sh # Unix/Linux/macOS test automation
+├── run-integration-tests.ps1 # Windows PowerShell test automation
+├── test_all_notes.sh        # Simple Unix test runner
+├── test_all_notes.ps1       # Simple PowerShell test runner
+├── demo-testing-framework.sh # Unix testing demo
+├── demo-testing-framework.ps1 # PowerShell testing demo
 └── TEST_SUMMARY.md          # Test documentation
 ```
 
@@ -239,22 +244,25 @@ Comprehensive regression testing framework that compares actual outputs against 
 # Navigate to test directory
 cd tests
 
-# Run full test suite
+# Unix/Linux/macOS
 ./run-integration-tests.sh
-
-# Run only batch processing
 ./run-integration-tests.sh --batch-only
-
-# Run with verbose output
 ./run-integration-tests.sh --verbose
+
+# Windows (PowerShell) - same options
+.\run-integration-tests.ps1
+.\run-integration-tests.ps1 -BatchOnly
+.\run-integration-tests.ps1 -Verbose
 ```
 
 ### Test Coverage
 - **📁 Assignment Requirements**: Original 3 test files (100% passing)
 - **🏥 Enhanced DME Devices**: 7 additional device types
 - **📝 Input Formats**: Both `.txt` and `.json` files
-- **🔄 Batch Processing**: End-to-end workflow testing
+- **🔄 Batch Processing**: End-to-end workflow testing with GPT-4o
 - **📊 Regression Detection**: Automated comparison against expected outputs
+- **🧪 Test Environment Controls**: Clean API mocking with configurable posting
+- **🌐 Cross-Platform**: Both Unix shell and Windows PowerShell scripts
 
 ### CI/CD Integration
 GitHub Actions workflow provides:
@@ -291,6 +299,12 @@ GitHub Actions workflow provides:
       "Model": "gpt-4o", 
       "MaxTokens": 1000,
       "Temperature": 0.1
+    },
+    "Api": {
+      "BaseUrl": "https://alert-api.com",
+      "TimeoutSeconds": 30,
+      "RetryCount": 3,
+      "EnableApiPosting": false
     }
   },
   "ApplicationInsights": {
@@ -332,9 +346,10 @@ Use Azure Key Vault, AWS Secrets Manager, or environment variables.
 ## 📈 Performance & Scalability
 
 ### Current Performance
-- **Processing Speed**: ~50ms per note (regex), ~500ms (LLM)
-- **Throughput**: 1000+ notes/minute in batch mode
+- **Processing Speed**: ~50ms per note (regex), ~1200ms (GPT-4o LLM)
+- **Throughput**: 50+ notes/minute in batch mode (LLM), 1000+ (regex fallback)
 - **Memory Usage**: <50MB baseline, scales with batch size
+- **API Management**: Configurable API posting with test environment detection
 
 ### Scalability Options
 - **Horizontal Scaling**: Deploy multiple instances with load balancer
@@ -397,8 +412,9 @@ docker run -p 8080:80 signalbooster-mvp
 
 ### Prerequisites
 - .NET 8.0 SDK
-- VS Code with C# extension
+- VS Code with C# extension (or any IDE)
 - Git for version control
+- PowerShell 5.1+ (Windows) or Bash (Unix/Linux/macOS)
 - Optional: Docker for containerization
 
 ### Development Workflow

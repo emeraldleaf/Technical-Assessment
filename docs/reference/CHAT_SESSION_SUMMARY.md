@@ -39,7 +39,7 @@ This session focused on cleaning up the SignalBooster MVP project structure, ren
 
 #### **Configuration Files Updated:**
 - `src/appsettings.json` - Updated batch processing paths
-- `tests/SignalBooster.Mvp.Tests.csproj` - Updated project reference path
+- `tests/SignalBooster.Tests.csproj` - Updated project reference path
 - `tests/run-integration-tests.sh` - Updated main project path
 
 #### **Documentation Files Updated:**
@@ -99,7 +99,7 @@ After:
 
 2. **`tests/run-integration-tests.sh`**
    ```bash
-   MAIN_PROJECT="../src/SignalBooster.Mvp.csproj"
+   MAIN_PROJECT="../src/SignalBooster.csproj"
    ```
 
 3. **`.github/workflows/ci.yml`**
@@ -112,7 +112,7 @@ After:
    ```
 
 ### **Build Verification**
-- **Build Command:** `dotnet build SignalBooster.Mvp.csproj --configuration Release`
+- **Build Command:** `dotnet build SignalBooster.csproj --configuration Release`
 - **Result:** Success with 1 warning (ApplicationInsights deprecation)
 - **Publish Command:** `dotnet publish --configuration Release --output ./publish`
 - **Result:** 72 files published successfully
@@ -157,7 +157,7 @@ After:
 
 📦 Publish Application: ✅ PASS
    - 72 artifacts generated
-   - SignalBooster.Mvp.dll created
+   - SignalBooster.dll created
 
 📈 Test Coverage: ✅ PASS
    - 11/11 tests passed
@@ -185,12 +185,12 @@ Technical Assessment/
 │   ├── Services/
 │   ├── Configuration/
 │   ├── Program.cs
-│   └── SignalBooster.Mvp.csproj
+│   └── SignalBooster.csproj
 ├── tests/                      # Testing infrastructure  
 │   ├── test_notes/            # Input test files
 │   ├── test_outputs/          # Expected & actual results
 │   ├── run-integration-tests.sh
-│   └── SignalBooster.Mvp.Tests.csproj
+│   └── SignalBooster.Tests.csproj
 ├── README.md                   # Main documentation
 ├── SignalBooster-Queries.kql  # Application Insights queries
 └── [Other documentation files]
@@ -241,7 +241,7 @@ rm batch_output.log appsettings.json.backup SignalBooster-Queries.kql
 # Updated paths from mvp_tests to tests
 
 # Pipeline testing
-dotnet build SignalBooster.Mvp.csproj --configuration Release
+dotnet build SignalBooster.csproj --configuration Release
 dotnet publish --configuration Release --output ./publish
 ./run-integration-tests.sh --batch-only
 dotnet test --collect:"XPlat Code Coverage"

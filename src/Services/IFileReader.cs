@@ -1,4 +1,4 @@
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 public interface IFileReader
 {

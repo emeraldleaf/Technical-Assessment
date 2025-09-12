@@ -2,10 +2,10 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SignalBooster.Mvp.Configuration;
-using SignalBooster.Mvp.Models;
+using SignalBooster.Configuration;
+using SignalBooster.Models;
 
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 public class ApiClient : IApiClient
 {

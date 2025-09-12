@@ -80,16 +80,16 @@ jobs:
         
     - name: 📦 Restore Dependencies
       working-directory: src
-      run: dotnet restore SignalBooster.Mvp.csproj
+      run: dotnet restore SignalBooster.csproj
       
     - name: 🔨 Build Application
       working-directory: src
-      run: dotnet build SignalBooster.Mvp.csproj --configuration Release --no-restore
+      run: dotnet build SignalBooster.csproj --configuration Release --no-restore
       
     - name: 📦 Publish Application
       working-directory: src
       run: |
-        dotnet publish SignalBooster.Mvp.csproj \
+        dotnet publish SignalBooster.csproj \
           --configuration Release \
           --output ./publish \
           --no-build \
@@ -119,7 +119,7 @@ jobs:
       working-directory: src
       run: |
         echo "🔍 Running static code analysis..."
-        dotnet build SignalBooster.Mvp.csproj --verbosity normal | tee build-warnings.log
+        dotnet build SignalBooster.csproj --verbosity normal | tee build-warnings.log
         
         # Check for warnings
         if grep -q "warning" build-warnings.log; then
@@ -133,7 +133,7 @@ jobs:
       working-directory: tests
       run: |
         echo "📈 Analyzing test coverage..."
-        dotnet test SignalBooster.Mvp.Tests.csproj \
+        dotnet test SignalBooster.Tests.csproj \
           --collect:"XPlat Code Coverage" \
           --results-directory ./coverage \
           --verbosity minimal

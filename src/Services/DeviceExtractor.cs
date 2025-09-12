@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using SignalBooster.Mvp.Configuration;
-using SignalBooster.Mvp.Models;
+using SignalBooster.Configuration;
+using SignalBooster.Models;
 using System.Text.Json;
 
-namespace SignalBooster.Mvp.Services;
+namespace SignalBooster.Services;
 
 /// <summary>
 /// Main orchestration service for DME device order processing

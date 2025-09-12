@@ -1,12 +1,12 @@
-using SignalBooster.Mvp.Services;
-using SignalBooster.Mvp.Models;
+using SignalBooster.Services;
+using SignalBooster.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SignalBooster.Mvp.Configuration;
+using SignalBooster.Configuration;
 using NSubstitute;
 using Xunit;
 
-namespace SignalBooster.Mvp.Tests;
+namespace SignalBooster.Tests;
 
 public class TextParserTests
 {

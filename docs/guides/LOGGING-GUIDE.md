@@ -107,7 +107,7 @@ logs/
   "FilePath": "test_notes/physician_note1.txt",
   "ProcessingMode": "LLM",
   "NoteLength": 196,
-  "SourceContext": "SignalBooster.Mvp.Services.DeviceExtractor"
+  "SourceContext": "SignalBooster.Services.DeviceExtractor"
 }
 ```
 
