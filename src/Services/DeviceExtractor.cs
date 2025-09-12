@@ -154,12 +154,6 @@ public class DeviceExtractor
         _logger.LogInformation("[{Class}.{Method}] Step 1: Starting batch processing mode. CorrelationId: {CorrelationId}",
             nameof(DeviceExtractor), nameof(ProcessAllNotesAsync), correlationId);
 
-        // Cleanup existing actual files if configured
-        if (_options.Files.CleanupActualFiles)
-        {
-            CleanupActualFiles();
-        }
-
         // Scan for input files
         var inputFiles = GetInputFiles();
         _logger.LogInformation("[{Class}.{Method}] Step 2: Found {FileCount} files to process in {InputDirectory}",
@@ -181,10 +175,7 @@ public class DeviceExtractor
                 var deviceOrder = await ProcessNoteAsync(inputFile);
                 results.Add((fileName, deviceOrder));
 
-                // Save individual output file
-                await SaveOutputFileAsync(fileName, deviceOrder);
-                
-                _logger.LogInformation("[{Class}.{Method}] Step 4.{Index}: Successfully processed and saved {FileName}",
+                _logger.LogInformation("[{Class}.{Method}] Step 4.{Index}: Successfully processed {FileName}",
                     nameof(DeviceExtractor), nameof(ProcessAllNotesAsync), i + 1, fileName);
             }
             catch (Exception ex)
@@ -234,73 +225,5 @@ public class DeviceExtractor
 
         // Deterministic ordering for consistent batch processing
         return files.OrderBy(f => f).ToList();
-    }
-
-    /// <summary>
-    /// Cleans up previous actual output files for fresh batch runs
-    /// 
-    /// Benefits:
-    /// - Ensures clean slate for each batch run
-    /// - Prevents confusion from stale results
-    /// - Configurable via CleanupActualFiles setting
-    /// - Only removes *_actual.json files (preserves expected files)
-    /// </summary>
-    private void CleanupActualFiles()
-    {
-        var outputDirectory = _options.Files.BatchOutputDirectory;
-        
-        if (!Directory.Exists(outputDirectory))
-        {
-            _logger.LogInformation("[{Class}.{Method}] Output directory {OutputDirectory} does not exist. Creating it.",
-                nameof(DeviceExtractor), nameof(CleanupActualFiles), outputDirectory);
-            Directory.CreateDirectory(outputDirectory);
-            return;
-        }
-
-        var actualFiles = Directory.GetFiles(outputDirectory, "*_actual.json");
-        foreach (var file in actualFiles)
-        {
-            File.Delete(file);
-            _logger.LogDebug("[{Class}.{Method}] Deleted existing actual file: {FileName}",
-                nameof(DeviceExtractor), nameof(CleanupActualFiles), Path.GetFileName(file));
-        }
-
-        _logger.LogInformation("[{Class}.{Method}] Cleaned up {FileCount} existing actual files from {OutputDirectory}",
-            nameof(DeviceExtractor), nameof(CleanupActualFiles), actualFiles.Length, outputDirectory);
-    }
-
-    /// <summary>
-    /// Saves individual device order to standardized JSON output file
-    /// 
-    /// File Naming Convention:
-    /// - Input: "physician_note1.txt" → Output: "physician_note1_actual.json"
-    /// - Consistent "_actual" suffix for automated testing
-    /// 
-    /// JSON Configuration:
-    /// - snake_case property naming for API compatibility
-    /// - Indented formatting for human readability
-    /// - Async I/O for performance in batch operations
-    /// </summary>
-    private async Task SaveOutputFileAsync(string fileName, DeviceOrder deviceOrder)
-    {
-        var outputDirectory = _options.Files.BatchOutputDirectory;
-        
-        if (!Directory.Exists(outputDirectory))
-        {
-            Directory.CreateDirectory(outputDirectory);
-        }
-
-        var outputFilePath = Path.Combine(outputDirectory, $"{fileName}_actual.json");
-        var jsonOptions = new JsonSerializerOptions 
-        { 
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        };
-        
-        var json = JsonSerializer.Serialize(deviceOrder, jsonOptions);
-        await File.WriteAllTextAsync(outputFilePath, json);
-        
-        _logger.LogDebug("[{Class}.{Method}] Saved output file: {OutputFilePath}",
-            nameof(DeviceExtractor), nameof(SaveOutputFileAsync), outputFilePath);
     }
 }

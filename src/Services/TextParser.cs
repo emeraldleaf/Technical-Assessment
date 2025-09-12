@@ -233,7 +233,8 @@ Return valid JSON only.";
             text.Contains("rollator", StringComparison.OrdinalIgnoreCase))
             return "Walker";
         
-        if (text.Contains("nebulizer", StringComparison.OrdinalIgnoreCase))
+        if (text.Contains("nebulizer", StringComparison.OrdinalIgnoreCase) ||
+            text.Contains("breathing machine", StringComparison.OrdinalIgnoreCase))
             return "Nebulizer";
         
         // Hospital bed and mattress

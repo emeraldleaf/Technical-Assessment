@@ -68,12 +68,6 @@ public class FileOptions
     
     /// <summary>Directory to scan for input files in batch mode</summary>
     public string BatchInputDirectory { get; set; } = "test_notes";
-    
-    /// <summary>Directory for batch processing output files</summary>
-    public string BatchOutputDirectory { get; set; } = "test_outputs";
-    
-    /// <summary>Delete existing *_actual.json files before batch run</summary>
-    public bool CleanupActualFiles { get; set; } = true;
 }
 
 /// <summary>
