@@ -1,0 +1,12 @@
+{
+  "device": "Ventilator",
+  "liters": null,
+  "usage": "24-hour ventilatory support needed for survival",
+  "diagnosis": "Chronic respiratory failure, ALS",
+  "ordering_provider": "Dr. Thompson",
+  "patient_name": "Michael Rodriguez",
+  "dob": "06/22/1956",
+  "mask_type": null,
+  "add_ons": null,
+  "qualifier": "progressive respiratory muscle weakness"
+}

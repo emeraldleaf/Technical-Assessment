@@ -1,0 +1,15 @@
+{
+  "device": "Hospital Bed",
+  "liters": null,
+  "usage": null,
+  "diagnosis": "Post-surgical recovery, limited mobility",
+  "ordering_provider": "Dr. Martinez",
+  "patient_name": "Robert Wilson",
+  "dob": "08/15/1978",
+  "mask_type": null,
+  "add_ons": [
+    "side rails",
+    "pressure relief"
+  ],
+  "qualifier": "pressure sore risk"
+}

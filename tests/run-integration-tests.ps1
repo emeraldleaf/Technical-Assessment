@@ -22,8 +22,8 @@ $ErrorActionPreference = "Stop"
 # Configuration
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectDir = $ScriptDir
-$TestProject = "SignalBooster.Mvp.IntegrationTests.csproj"
-$MainProject = "..\src\SignalBooster.Mvp.csproj"
+$TestProject = "SignalBooster.IntegrationTests.csproj"
+$MainProject = "..\src\SignalBooster.csproj"
 
 # Colors for output (PowerShell color names)
 function Write-Info($message) {

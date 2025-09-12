@@ -16,8 +16,8 @@ set -e  # Exit on any error
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$SCRIPT_DIR"
-TEST_PROJECT="SignalBooster.Mvp.IntegrationTests.csproj"
-MAIN_PROJECT="../src/SignalBooster.Mvp.csproj"
+TEST_PROJECT="SignalBooster.IntegrationTests.csproj"
+MAIN_PROJECT="../src/SignalBooster.csproj"
 
 # Colors for output
 RED='\033[0;31m'
