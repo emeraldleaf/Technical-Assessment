@@ -7,6 +7,9 @@
   "patient_name": "Eleanor Davis",
   "dob": "11/28/1938",
   "mask_type": null,
-  "add_ons": null,
-  "qualifier": null
+  "add_ons": [
+    "raised toilet seat",
+    "shower chair"
+  ],
+  "qualifier": "High fall risk due to limited mobility and balance issues"
 }

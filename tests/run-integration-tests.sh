@@ -134,9 +134,11 @@ build_projects() {
     
     log_info "Restoring NuGet packages..."
     if [ "$VERBOSE" = true ]; then
-        dotnet restore
+        dotnet restore "$MAIN_PROJECT"
+        dotnet restore "$TEST_PROJECT"
     else
-        dotnet restore > /dev/null
+        dotnet restore "$MAIN_PROJECT" > /dev/null
+        dotnet restore "$TEST_PROJECT" > /dev/null
     fi
     
     log_info "Building main project..."
@@ -164,27 +166,27 @@ run_batch_processing() {
     
     # Create temporary config file with batch mode enabled
     TEMP_CONFIG=$(mktemp)
-    cat appsettings.json | sed 's/"BatchProcessingMode": false/"BatchProcessingMode": true/' > "$TEMP_CONFIG"
+    cat ../src/appsettings.json | sed 's/"BatchProcessingMode": false/"BatchProcessingMode": true/' > "$TEMP_CONFIG"
     
     # Backup original config and use temporary config
-    cp appsettings.json appsettings.json.backup
-    cp "$TEMP_CONFIG" appsettings.json
+    cp ../src/appsettings.json ../src/appsettings.json.backup
+    cp "$TEMP_CONFIG" ../src/appsettings.json
     
     # Count input files
     INPUT_COUNT=$(find test_notes -name "*.txt" -o -name "*.json" | wc -l | tr -d ' ')
     log_info "Found $INPUT_COUNT input files to process"
     
-    # Run batch processing
+    # Run batch processing from the src directory
     log_info "Processing all test files..."
     if [ "$VERBOSE" = true ]; then
-        dotnet run --project "$MAIN_PROJECT" --configuration Release
+        (cd ../src && dotnet run --configuration Release)
     else
-        BATCH_OUTPUT=$(dotnet run --project "$MAIN_PROJECT" --configuration Release 2>&1)
+        BATCH_OUTPUT=$((cd ../src && dotnet run --configuration Release) 2>&1)
         if [ $? -ne 0 ]; then
             log_error "Batch processing failed:"
             echo "$BATCH_OUTPUT"
             # Restore original config
-            mv appsettings.json.backup appsettings.json
+            mv ../src/appsettings.json.backup ../src/appsettings.json
             rm -f "$TEMP_CONFIG"
             exit 1
         fi
@@ -195,7 +197,7 @@ run_batch_processing() {
     fi
     
     # Restore original config
-    mv appsettings.json.backup appsettings.json
+    mv ../src/appsettings.json.backup ../src/appsettings.json
     rm -f "$TEMP_CONFIG"
     
     # Verify output files were generated

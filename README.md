@@ -5,7 +5,7 @@
 A production-ready MVP for DME (Durable Medical Equipment) device order processing that extracts structured data from physician notes using advanced LLM integration, comprehensive testing, and enterprise observability features.
 
 **Key Value Propositions:**
-- **99.5% Accuracy**: LLM-powered extraction with regex fallback ensures reliable data processing
+- **Reliable Extraction**: LLM-powered extraction with regex fallback ensures consistent data processing
 - **Enterprise Scale**: Built with organized service architecture, SOLID principles, and comprehensive testing
 - **Production Ready**: Complete CI/CD pipeline, observability, and deployment automation
 - **Extensible**: Supports 20+ DME device types with easy expansion capabilities
@@ -136,7 +136,7 @@ Built with clear separation of concerns and logical organization (note: this is 
 ### 🤖 Advanced LLM Integration
 - **Multi-Provider Support**: OpenAI API, Azure OpenAI
 - **Intelligent Fallback**: Automatic fallback to regex parsing
-- **Configurable Models**: GPT-3.5-turbo, GPT-4, custom models
+- **Configurable Models**: GPT-4o (default), GPT-4, GPT-3.5-turbo, custom models
 - **Token Optimization**: Configurable max tokens and temperature
 - **Error Resilience**: Graceful degradation on API failures
 
@@ -288,7 +288,7 @@ GitHub Actions workflow provides:
     },
     "OpenAI": {
       "ApiKey": "",
-      "Model": "gpt-3.5-turbo", 
+      "Model": "gpt-4o", 
       "MaxTokens": 1000,
       "Temperature": 0.1
     }
@@ -335,7 +335,6 @@ Use Azure Key Vault, AWS Secrets Manager, or environment variables.
 - **Processing Speed**: ~50ms per note (regex), ~500ms (LLM)
 - **Throughput**: 1000+ notes/minute in batch mode
 - **Memory Usage**: <50MB baseline, scales with batch size
-- **Accuracy**: 99.5% with LLM, 95% with regex fallback
 
 ### Scalability Options
 - **Horizontal Scaling**: Deploy multiple instances with load balancer
@@ -477,6 +476,31 @@ This is a technical assessment project demonstrating enterprise-grade software d
 - **Testing**: Golden master test framework for validation
 - **Monitoring**: Application Insights for production support
 - **Configuration**: Flexible settings for all environments
+
+---
+
+## 📄 Development Environment
+
+**IDE and Tools Used:**
+- **VS Code**: Primary development environment
+- **Claude Code**: AI-powered development assistant
+- **GitHub Copilot**: AI pair programming tool
+
+**Assumptions and Limitations:**
+- OpenAI API key is optional; system gracefully falls back to regex parsing
+- Input files are assumed to be in UTF-8 encoding
+- Current implementation focuses on English language physician notes
+- Batch processing mode processes files sequentially (not parallel)
+
+**Future Improvements:**
+- Add support for additional LLM providers (Anthropic Claude, Google Gemini)
+- Implement parallel batch processing for better performance
+- Add support for multiple languages and medical terminology
+- Enhance regex patterns with machine learning-based improvements
+- Add real-time API endpoint for web integration
+
+**Instructions to Run:**
+See the 🚀 Quick Start section above for detailed setup and usage instructions.
 
 ---
 

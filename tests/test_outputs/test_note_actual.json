@@ -2,10 +2,10 @@
   "device": "CPAP",
   "liters": null,
   "usage": null,
-  "diagnosis": "Unknown",
+  "diagnosis": "sleep apnea",
   "ordering_provider": "Dr. Smith",
-  "patient_name": "Unknown",
-  "dob": "Unknown",
+  "patient_name": null,
+  "dob": null,
   "mask_type": null,
   "add_ons": null,
   "qualifier": null

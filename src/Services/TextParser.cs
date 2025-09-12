@@ -135,7 +135,9 @@ Return valid JSON only.";
     {
         try
         {
-            var jsonDoc = JsonDocument.Parse(llmResponse);
+            // Clean up the LLM response - remove markdown code blocks and extra formatting
+            var cleanedResponse = CleanLlmResponse(llmResponse);
+            var jsonDoc = JsonDocument.Parse(cleanedResponse);
             var root = jsonDoc.RootElement;
 
             var addOns = new List<string>();
@@ -169,11 +171,42 @@ Return valid JSON only.";
         }
     }
 
+    private static string CleanLlmResponse(string response)
+    {
+        if (string.IsNullOrWhiteSpace(response))
+            return response;
+
+        // Remove markdown code block markers
+        response = response.Trim();
+        if (response.StartsWith("```json"))
+            response = response.Substring(7);
+        else if (response.StartsWith("```"))
+            response = response.Substring(3);
+            
+        if (response.EndsWith("```"))
+            response = response.Substring(0, response.Length - 3);
+            
+        return response.Trim();
+    }
+
     private static string? GetStringProperty(JsonElement element, string propertyName)
     {
-        return element.TryGetProperty(propertyName, out var prop) && prop.ValueKind == JsonValueKind.String 
-            ? prop.GetString() 
-            : null;
+        if (element.TryGetProperty(propertyName, out var prop) && prop.ValueKind == JsonValueKind.String)
+        {
+            var value = prop.GetString();
+            if (value != null)
+            {
+                // Clean up common JSON parsing issues
+                value = value.Trim()
+                           .TrimEnd(',')  // Remove trailing commas
+                           .Trim('"')     // Remove extra quotes
+                           .Trim();       // Final trim
+                
+                // Handle empty strings
+                return string.IsNullOrWhiteSpace(value) ? null : value;
+            }
+        }
+        return null;
     }
     
     private static string DetermineDeviceType(string text)

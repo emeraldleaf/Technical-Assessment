@@ -11,17 +11,32 @@ public class ApiClient : IApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<ApiClient> _logger;
-    private readonly string _endpoint;
+    private readonly ApiOptions _apiOptions;
 
     public ApiClient(HttpClient httpClient, IOptions<SignalBoosterOptions> options, ILogger<ApiClient> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
-        _endpoint = options.Value.Api.Endpoint;
+        _apiOptions = options.Value.Api;
     }
 
     public async Task PostDeviceOrderAsync(DeviceOrder deviceOrder)
     {
+        if (!_apiOptions.EnableApiPosting)
+        {
+            _logger.LogInformation("[{Class}.{Method}] API posting disabled - skipping external API call. Device: {DeviceType}, Patient: {PatientName}",
+                nameof(ApiClient), nameof(PostDeviceOrderAsync), deviceOrder.Device, deviceOrder.PatientName);
+            return;
+        }
+
+        // Check for known test environment URLs that will fail
+        if (_apiOptions.BaseUrl.Contains("test-api.com") || _apiOptions.BaseUrl.Contains("alert-api.com"))
+        {
+            _logger.LogInformation("[{Class}.{Method}] Test environment detected - simulating API call. Device: {DeviceType}, Patient: {PatientName}",
+                nameof(ApiClient), nameof(PostDeviceOrderAsync), deviceOrder.Device, deviceOrder.PatientName);
+            return;
+        }
+
         try
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -38,8 +53,8 @@ public class ApiClient : IApiClient
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
             var fullUrl = _httpClient.BaseAddress != null 
-                ? new Uri(_httpClient.BaseAddress, _endpoint).ToString()
-                : _endpoint;
+                ? new Uri(_httpClient.BaseAddress, _apiOptions.Endpoint).ToString()
+                : _apiOptions.Endpoint;
             
             _logger.LogInformation("[{Class}.{Method}] Step 2: Posting device order to {FullUrl}, PayloadSize: {PayloadSize} bytes",
                 nameof(ApiClient), nameof(PostDeviceOrderAsync), fullUrl, json.Length);

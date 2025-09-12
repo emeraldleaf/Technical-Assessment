@@ -7,6 +7,10 @@
   "patient_name": "Robert Wilson",
   "dob": "08/15/1978",
   "mask_type": null,
-  "add_ons": null,
-  "qualifier": null
+  "add_ons": [
+    "adjustable height",
+    "side rails",
+    "pressure relieving mattress"
+  ],
+  "qualifier": "high risk of pressure sores"
 }

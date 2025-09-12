@@ -92,7 +92,7 @@ logs/
 **Console Output:**
 ```
 [16:57:00 INF] [DeviceExtractor.ProcessNoteAsync] Step 1: Starting device order processing for test_notes/physician_note1.txt with LLM, NoteLength: 196 chars
-[16:57:01 INF] [TextParser.ParseDeviceOrderAsync] Step 1: Configuring OpenAI LLM extraction. Model: gpt-3.5-turbo, MaxTokens: 1000, Temperature: 0.1
+[16:57:01 INF] [TextParser.ParseDeviceOrderAsync] Step 1: Configuring OpenAI LLM extraction. Model: gpt-4o, MaxTokens: 1000, Temperature: 0.1
 [16:57:02 INF] [DeviceExtractor.ProcessNoteAsync] Step 2: Device order extracted successfully. Device: Oxygen Tank, Patient: Harold Finch, Provider: Dr. Cuddy, ParseDuration: 847ms
 ```
 

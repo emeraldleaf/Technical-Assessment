@@ -1,5 +1,5 @@
 {
-  "device": "Mobility Scooter",
+  "device": "mobility scooter",
   "liters": null,
   "usage": null,
   "diagnosis": "Severe arthritis, mobility impairment",
@@ -8,5 +8,5 @@
   "dob": "12/03/1942",
   "mask_type": null,
   "add_ons": null,
-  "qualifier": null
+  "qualifier": "Unable to walk distances greater than 50 feet due to joint pain"
 }

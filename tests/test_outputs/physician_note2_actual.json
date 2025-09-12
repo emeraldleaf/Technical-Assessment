@@ -2,13 +2,13 @@
   "device": "CPAP",
   "liters": null,
   "usage": null,
-  "diagnosis": "Severe sleep apnea\\nRecommendation: CPAP therapy with full face mask and heated humidifier.\\nAHI: 28\\nOrdering Physician: Dr. Foreman\\n\u0022",
-  "ordering_provider": "Dr. Foreman\\n\u0022",
-  "patient_name": "Lisa Turner\\nDOB: 09/23/1984\\nDiagnosis: Severe sleep apnea\\nRecommendation: CPAP therapy with full face mask and heated humidifier.\\nAHI: 28\\nOrdering Physician: Dr. Foreman\\n\u0022",
-  "dob": "09/23/1984\\nDiagnosis: Severe sleep apnea\\nRecommendation: CPAP therapy with full face mask and heated humidifier.\\nAHI: 28\\nOrdering Physician: Dr. Foreman\\n\u0022",
+  "diagnosis": "Severe sleep apnea",
+  "ordering_provider": "Dr. Foreman",
+  "patient_name": "Lisa Turner",
+  "dob": "09/23/1984",
   "mask_type": "full face",
   "add_ons": [
-    "humidifier"
+    "heated humidifier"
   ],
-  "qualifier": null
+  "qualifier": "AHI \u003E 20"
 }

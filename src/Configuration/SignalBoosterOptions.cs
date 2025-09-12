@@ -46,6 +46,9 @@ public class ApiOptions
     
     /// <summary>Number of retry attempts for failed API calls</summary>
     public int RetryCount { get; set; } = 3;
+    
+    /// <summary>Enable API posting (set to false in test environments)</summary>
+    public bool EnableApiPosting { get; set; } = true;
 }
 
 /// <summary>
@@ -83,7 +86,7 @@ public class OpenAIOptions
     public string ApiKey { get; set; } = string.Empty;
     
     /// <summary>LLM model to use for text extraction</summary>
-    public string Model { get; set; } = "gpt-3.5-turbo";
+    public string Model { get; set; } = "gpt-4o";
     
     /// <summary>Maximum tokens in LLM response</summary>
     public int MaxTokens { get; set; } = 1000;

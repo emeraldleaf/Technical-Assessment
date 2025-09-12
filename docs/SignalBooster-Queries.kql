@@ -308,6 +308,7 @@ traces
     ApiCalls = count()
     by bin(timestamp, 1d), Model
 | extend EstimatedCost = case(
+    Model == "gpt-4o", TotalTokensUsed * 0.015 / 1000,        // $0.015 per 1K tokens (input)
     Model == "gpt-3.5-turbo", TotalTokensUsed * 0.002 / 1000, // $0.002 per 1K tokens
     Model == "gpt-4", TotalTokensUsed * 0.03 / 1000,          // $0.03 per 1K tokens
     TotalTokensUsed * 0.002 / 1000                            // Default pricing

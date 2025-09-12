@@ -258,7 +258,7 @@ The system uses a **fallback strategy**:
   "SignalBooster": {
     "OpenAI": {
       "ApiKey": "",                    // Set in appsettings.Local.json
-      "Model": "gpt-3.5-turbo",       // or "gpt-4"
+      "Model": "gpt-4o",              // Default: gpt-4o, also: "gpt-4", "gpt-3.5-turbo"
       "MaxTokens": 1000,              // Response limit
       "Temperature": 0.1              // Low for consistent results
     }
