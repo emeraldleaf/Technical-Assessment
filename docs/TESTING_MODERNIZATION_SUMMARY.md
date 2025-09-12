@@ -192,7 +192,7 @@ All documentation has been updated to reflect modern testing approach:
 ### Main Documentation
 - ✅ **README.md** - Updated testing sections with modern commands
 - ✅ **docs/guides/PIPELINE_TESTING_GUIDE.md** - Modern CI/CD practices
-- ✅ **tests/TEST_SUMMARY.md** - Modern testing framework overview
+- ✅ **docs/reference/TEST_SUMMARY.md** - Modern testing framework overview
 
 ### Technical Documentation  
 - ✅ All references to custom scripts removed

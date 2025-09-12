@@ -1,15 +1,23 @@
+using System.IO.Abstractions;
 using System.Text.Json;
 
 namespace SignalBooster.Services;
 
 public class FileReader : IFileReader
 {
+    private readonly IFileSystem _fileSystem;
+
+    public FileReader(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+
     public async Task<string> ReadTextAsync(string filePath)
     {
-        if (!File.Exists(filePath))
+        if (!_fileSystem.File.Exists(filePath))
             throw new FileNotFoundException($"File not found: {filePath}");
         
-        var content = await File.ReadAllTextAsync(filePath);
+        var content = await _fileSystem.File.ReadAllTextAsync(filePath);
         
         // Support JSON-wrapped notes
         if (filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))

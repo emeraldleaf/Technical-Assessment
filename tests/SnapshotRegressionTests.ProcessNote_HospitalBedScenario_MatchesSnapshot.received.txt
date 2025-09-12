@@ -1,7 +1,0 @@
-﻿{
-  Device: Hospital Bed,
-  Diagnosis: Post-surgical recovery, mobility limitations,
-  OrderingProvider: Dr. Stevens,
-  PatientName: Maria Gonzalez,
-  Dob: Date_1
-}

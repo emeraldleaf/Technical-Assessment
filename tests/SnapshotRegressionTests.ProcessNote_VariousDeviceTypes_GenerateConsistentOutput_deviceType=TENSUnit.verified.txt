@@ -1,1 +1,7 @@
-﻿
+﻿{
+  Device: TENS Unit,
+  Diagnosis: chronic pain,
+  OrderingProvider: Dr. TestTENSUnit,
+  PatientName: John Doe,
+  Dob: Date_1
+}

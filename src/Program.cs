@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.Text.Json;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
@@ -190,6 +191,9 @@ class Program
                     client.BaseAddress = new Uri(options.Value.Api.BaseUrl);
                     client.Timeout = TimeSpan.FromSeconds(options.Value.Api.TimeoutSeconds);
                 });
+                
+                // File System Abstraction for testability
+                services.AddSingleton<IFileSystem, FileSystem>();  // Real file system for production
                 
                 // Core Business Logic Services (Scoped for request isolation)
                 services.AddScoped<IFileReader, FileReader>();     // File I/O operations

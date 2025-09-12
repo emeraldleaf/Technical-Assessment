@@ -1,1 +1,12 @@
-﻿
+﻿{
+  Device: CPAP,
+  Diagnosis: Severe sleep apnea,
+  OrderingProvider: Dr. Foreman,
+  PatientName: Lisa Turner,
+  Dob: Date_1,
+  MaskType: full face,
+  AddOns: [
+    humidifier
+  ],
+  Qualifier: AHI > 20
+}

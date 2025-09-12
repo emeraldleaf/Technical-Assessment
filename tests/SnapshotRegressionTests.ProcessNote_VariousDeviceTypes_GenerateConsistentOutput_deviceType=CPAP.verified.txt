@@ -1,1 +1,7 @@
-﻿
+﻿{
+  Device: CPAP,
+  Diagnosis: sleep apnea,
+  OrderingProvider: Dr. TestCPAP,
+  PatientName: John Doe,
+  Dob: Date_1
+}

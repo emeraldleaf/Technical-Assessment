@@ -1,4 +1,5 @@
 using SignalBooster.Services;
+using System.IO.Abstractions;
 using Xunit;
 
 namespace SignalBooster.Tests;
@@ -6,7 +7,7 @@ namespace SignalBooster.Tests;
 [Trait("Category", "Integration")]
 public class FileReaderIntegrationTests
 {
-    private readonly FileReader _fileReader = new();
+    private readonly FileReader _fileReader = new(new FileSystem());
 
     [Fact]
     public async Task ReadTextAsync_JsonFileWithNote_ExtractsNoteContent()

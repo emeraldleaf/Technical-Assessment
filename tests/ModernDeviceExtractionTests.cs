@@ -22,7 +22,7 @@ public class ModernDeviceExtractionTests
 
     public ModernDeviceExtractionTests()
     {
-        var fileReader = new FileReader(); // Uses real FileReader with mocked file system
+        var fileReader = new FileReader(_fileSystem); // Inject mocked file system
         var options = Options.Create(new SignalBoosterOptions
         {
             OpenAI = new OpenAIOptions { ApiKey = "" }, // Force regex parsing for predictable tests

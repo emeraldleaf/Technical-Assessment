@@ -2,6 +2,8 @@
 
 ## 🎯 Main Documentation
 - **[Project README](../README.md)** - Main project overview, installation, and usage
+- **[Verification Guide](./VERIFICATION_GUIDE.md)** - Step-by-step setup and testing instructions
+- **[Testing Modernization Summary](./TESTING_MODERNIZATION_SUMMARY.md)** - Testing framework evolution and improvements
 - **[SignalBooster Queries](./SignalBooster-Queries.kql)** - Current Application Insights KQL queries for monitoring
 
 ---
@@ -31,17 +33,19 @@ Located in [`docs/reference/`](./reference/)
 ### Structure
 ```
 docs/
-├── README.md                    # This index file
-├── SignalBooster-Queries.kql   # Application Insights KQL queries
-├── guides/                      # User guides and how-tos  
-│   ├── DEVELOPER_GUIDE.md       # Development workflow
-│   ├── LOGGING-GUIDE.md         # Logging configuration
-│   └── PIPELINE_TESTING_GUIDE.md # CI/CD testing
-└── reference/                   # Reference materials
-    ├── TEST_SUMMARY.md          # Testing framework
+├── README.md                           # This index file
+├── VERIFICATION_GUIDE.md               # Setup and testing instructions
+├── TESTING_MODERNIZATION_SUMMARY.md    # Testing framework evolution
+├── SignalBooster-Queries.kql          # Application Insights KQL queries
+├── guides/                             # User guides and how-tos  
+│   ├── DEVELOPER_GUIDE.md              # Development workflow
+│   ├── LOGGING-GUIDE.md                # Logging configuration
+│   └── PIPELINE_TESTING_GUIDE.md      # CI/CD testing
+└── reference/                          # Reference materials
+    ├── TEST_SUMMARY.md                 # Testing framework
     ├── CODE-REVIEW-REFACTORING-NOTES.md # Code decisions
-    ├── CHAT_SESSION_SUMMARY.md  # Session history
-    └── EXAMPLES.md              # Code examples
+    ├── CHAT_SESSION_SUMMARY.md         # Session history
+    └── EXAMPLES.md                     # Code examples
 ```
 
 ### File Status

@@ -1,1 +1,9 @@
-﻿
+﻿{
+  Device: Oxygen Tank,
+  Liters: 2 L,
+  Usage: sleep and exertion,
+  Diagnosis: COPD,
+  OrderingProvider: Dr. Cuddy,
+  PatientName: Harold Finch,
+  Dob: Date_1
+}
