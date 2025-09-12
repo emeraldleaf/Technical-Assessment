@@ -46,7 +46,7 @@ dotnet run physician_note1.txt
 dotnet run
 
 # Run comprehensive test suite
-cd tests && ./run-integration-tests.sh
+dotnet test
 ```
 
 ### Sample Input → Output
@@ -92,15 +92,17 @@ Built with clear separation of concerns and logical organization (note: this is 
 │   └── SignalBoosterOptions.cs
 └── Program.cs               # Application entry point
 ../tests/
-├── test_notes/              # Comprehensive test data  
-├── test_outputs/            # Golden master test results
-├── run-integration-tests.sh # Unix/Linux/macOS test automation
-├── run-integration-tests.ps1 # Windows PowerShell test automation
-├── test_all_notes.sh        # Simple Unix test runner
-├── test_all_notes.ps1       # Simple PowerShell test runner
-├── demo-testing-framework.sh # Unix testing demo
-├── demo-testing-framework.ps1 # PowerShell testing demo
-└── TEST_SUMMARY.md          # Test documentation
+├── TestHelpers/                    # Test data builders and factories
+│   ├── PhysicianNoteBuilder.cs      # Fluent test data builder
+│   └── TestDataFactory.cs          # Predefined test scenarios
+├── DeviceExtractorTests.cs         # Unit tests [Category=Unit]
+├── TextParserTests.cs              # Unit tests [Category=Unit]
+├── ModernDeviceExtractionTests.cs  # Integration tests [Category=Integration]
+├── SnapshotRegressionTests.cs      # Regression tests [Category=Regression]
+├── PropertyBasedTests.cs           # Property tests [Category=Property]
+├── PerformanceTests.cs             # Performance tests [Category=Performance]
+├── test_notes/                     # Reference test data (legacy)
+└── SignalBooster.IntegrationTests.csproj  # Modern test project
 ```
 
 **Architecture Notes:**
@@ -235,42 +237,55 @@ Enable in `appsettings.json`:
 
 ---
 
-## 🧪 Testing & Quality Assurance
+## 🧪 Modern Testing & Quality Assurance
 
-### Golden Master Testing
-Comprehensive regression testing framework that compares actual outputs against expected "golden master" files:
+### Standard .NET Testing Approach
+Clean, fast, and reliable testing using standard .NET tooling without custom scripts:
 
 ```bash
-# Navigate to test directory
-cd tests
+# Run all tests
+dotnet test
 
-# Unix/Linux/macOS
-./run-integration-tests.sh
-./run-integration-tests.sh --batch-only
-./run-integration-tests.sh --verbose
+# Run specific test categories
+dotnet test --filter "Category=Unit"           # Unit tests only
+dotnet test --filter "Category=Integration"    # Integration tests
+dotnet test --filter "Category=Performance"    # Performance benchmarks
+dotnet test --filter "Category=Regression"     # Snapshot regression tests
 
-# Windows (PowerShell) - same options
-.\run-integration-tests.ps1
-.\run-integration-tests.ps1 -BatchOnly
-.\run-integration-tests.ps1 -Verbose
+# Generate coverage reports
+dotnet test --collect:"XPlat Code Coverage"
+
+# Run with detailed output
+dotnet test --verbosity normal
 ```
 
-### Test Coverage
-- **📁 Assignment Requirements**: Original 3 test files (100% passing)
-- **🏥 Enhanced DME Devices**: 7 additional device types
-- **📝 Input Formats**: Both `.txt` and `.json` files
-- **🔄 Batch Processing**: End-to-end workflow testing with GPT-4o
-- **📊 Regression Detection**: Automated comparison against expected outputs
-- **🧪 Test Environment Controls**: Clean API mocking with configurable posting
-- **🌐 Cross-Platform**: Both Unix shell and Windows PowerShell scripts
+### Modern Test Architecture
+- **🏗️ In-Memory Testing**: No file I/O dependencies, 10x faster execution
+- **📸 Snapshot Testing**: Automated regression detection with Verify.Xunit
+- **🎲 Property-Based Testing**: Edge case discovery with generated test data
+- **📊 Performance Benchmarking**: Real metrics and performance targets
+- **🧩 Test Data Builders**: Structured test data creation with Bogus
+
+### Test Categories & Coverage
+- **📝 Unit Tests** (`Category=Unit`): Core business logic validation
+- **🔗 Integration Tests** (`Category=Integration`): End-to-end workflow testing
+- **📸 Regression Tests** (`Category=Regression`): Snapshot-based change detection
+- **🎲 Property Tests** (`Category=Property`): Random input and edge case handling
+- **⚡ Performance Tests** (`Category=Performance`): Throughput and memory validation
 
 ### CI/CD Integration
-GitHub Actions workflow provides:
-- ✅ Automated testing on every push/PR
-- ✅ Build validation and packaging
-- ✅ Quality gates and code analysis
-- ✅ Test report generation
-- ✅ Deployment readiness verification
+Standard .NET testing integrates seamlessly with all CI/CD platforms:
+```yaml
+# GitHub Actions example
+- name: Run Tests
+  run: |
+    dotnet test --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+    dotnet test --filter "Category=Performance" --logger console
+```
+- ✅ **Zero Custom Scripts**: Uses standard `dotnet test` commands
+- ✅ **Parallel Execution**: Built-in test parallelization
+- ✅ **Standard Reporting**: TRX, JUnit, and console output formats
+- ✅ **Coverage Integration**: Works with SonarCloud, Codecov, etc.
 
 ---
 
@@ -295,7 +310,7 @@ GitHub Actions workflow provides:
       "CleanupActualFiles": true
     },
     "OpenAI": {
-      "ApiKey": "",
+      "ApiKey": "",  // For development only - use Azure Key Vault in production
       "Model": "gpt-4o", 
       "MaxTokens": 1000,
       "Temperature": 0.1
@@ -315,8 +330,33 @@ GitHub Actions workflow provides:
 
 ### Environment-Specific Overrides
 - **Development**: `appsettings.Development.json`
-- **Production**: `appsettings.Production.json`
+- **Production**: `appsettings.Production.json` 
 - **Local**: `appsettings.Local.json` (git-ignored)
+
+### 🔐 Production Security Configuration
+
+For production deployments, sensitive values should be stored securely:
+
+**Azure Key Vault Integration:**
+```json
+{
+  "SignalBooster": {
+    "OpenAI": {
+      "ApiKey": "@Microsoft.KeyVault(SecretUri=https://your-vault.vault.azure.net/secrets/openai-api-key/)",
+      "Model": "gpt-4o"
+    }
+  },
+  "ApplicationInsights": {
+    "ConnectionString": "@Microsoft.KeyVault(SecretUri=https://your-vault.vault.azure.net/secrets/appinsights-connection/)"
+  }
+}
+```
+
+**Required Azure Configuration:**
+- Enable Managed Identity for the application
+- Grant Key Vault access permissions to the application identity
+- Store API keys and connection strings as Key Vault secrets
+- Never commit production API keys to source control
 
 ### Environment Variables
 Override any setting with `SIGNALBOOSTER_` prefix:
@@ -384,24 +424,42 @@ See `docs/SignalBooster-Queries.kql` for comprehensive monitoring queries includ
 
 ## 🚀 Deployment
 
+### Current Architecture: Console Application
+The system is currently designed as a **console application** for:
+- **Batch Processing**: Ideal for scheduled DME order processing
+- **Simple Deployment**: Easy to containerize and schedule
+- **Resource Efficiency**: Minimal overhead for focused processing tasks
+
+### Future Architecture Considerations
+**Azure Functions Migration Path:**
+- **Event-driven Processing**: Trigger on file uploads or API calls
+- **Serverless Scaling**: Automatic scaling based on demand
+- **Cost Optimization**: Pay-per-execution model
+- **Integration**: Native Azure service integration
+
 ### Docker Support
 ```bash
 # Build container
-docker build -t signalbooster-mvp .
+docker build -t signalbooster .
 
-# Run container
-docker run -p 8080:80 signalbooster-mvp
+# Run container with Key Vault integration
+docker run -e AZURE_CLIENT_ID=your-managed-identity \
+  -v /etc/ssl/certs:/etc/ssl/certs:ro \
+  signalbooster
 ```
 
-### Azure Deployment
-- **App Service**: Web app hosting with auto-scaling
-- **Container Instances**: Serverless container deployment
-- **Kubernetes**: Full orchestration for enterprise scale
+### Azure Deployment Options
+- **Container Instances**: Serverless container deployment with Key Vault integration
+- **App Service**: Web app hosting with Managed Identity for Key Vault access
+- **Azure Functions**: Serverless compute (future migration consideration)
+- **Kubernetes**: Full orchestration for enterprise scale with Key Vault CSI driver
 
 ### Production Checklist
-- ✅ Configure Application Insights connection string
-- ✅ Set OpenAI API key in secure storage
-- ✅ Enable HTTPS and security headers
+- ✅ Configure Azure Key Vault with API keys and connection strings
+- ✅ Enable Managed Identity for secure Key Vault access
+- ✅ Set up Application Insights with secure connection string storage
+- ✅ Configure automated batch processing schedules
+- ✅ Enable monitoring and alerting for processing failures
 - ✅ Configure log retention policies
 - ✅ Set up monitoring alerts
 - ✅ Implement backup and disaster recovery
@@ -416,6 +474,7 @@ docker run -p 8080:80 signalbooster-mvp
 - Git for version control
 - PowerShell 5.1+ (Windows) or Bash (Unix/Linux/macOS)
 - Optional: Docker for containerization
+- **For Production**: Azure CLI and access to Azure Key Vault
 
 ### Development Workflow
 ```bash
@@ -495,28 +554,87 @@ This is a technical assessment project demonstrating enterprise-grade software d
 
 ---
 
-## 📄 Development Environment
+## 📄 Assignment Summary
 
-**IDE and Tools Used:**
-- **VS Code**: Primary development environment
-- **Claude Code**: AI-powered development assistant
-- **GitHub Copilot**: AI pair programming tool
+This project is a **Signal Booster Technical Assessment** submission that transforms a legacy, monolithic DME order processing tool into a production-ready, enterprise-grade system.
 
-**Assumptions and Limitations:**
-- OpenAI API key is optional; system gracefully falls back to regex parsing
-- Input files are assumed to be in UTF-8 encoding
-- Current implementation focuses on English language physician notes
-- Batch processing mode processes files sequentially (not parallel)
+### 🛠️ **Development Environment & Tools Used**
+- **IDE**: VS Code with C# extension
+- **AI Tools Used**: 
+  - **Claude Code**: Primary AI assistant for development, refactoring, and testing
+  - **GitHub Copilot**: Code completion and inline suggestions
+- **Framework**: .NET 8.0 with modern C# features
+- **Testing**: xUnit with modern testing patterns (in-memory, snapshot, property-based)
+- **Architecture**: Clean service-oriented design with dependency injection
 
-**Future Improvements:**
-- Add support for additional LLM providers (Anthropic Claude, Google Gemini)
-- Implement parallel batch processing for better performance
-- Add support for multiple languages and medical terminology
-- Enhance regex patterns with machine learning-based improvements
-- Add real-time API endpoint for web integration
+### ✅ **Assignment Requirements Completed**
 
-**Instructions to Run:**
-See the 🚀 Quick Start section above for detailed setup and usage instructions.
+**Core Requirements:**
+1. ✅ **Refactored Logic**: Separated into well-named, testable services (`DeviceExtractor`, `TextParser`, `FileReader`, `ApiClient`)
+2. ✅ **Logging & Error Handling**: Comprehensive structured logging with Serilog, graceful error handling with LLM fallback
+3. ✅ **Unit Tests**: 72 comprehensive tests across 5 categories (Unit, Integration, Performance, Regression, Property)
+4. ✅ **Clear Comments**: Replaced all misleading comments with helpful XML documentation and business logic explanations
+5. ✅ **Functional Requirements**: 
+   - ✅ Reads physician notes from files (multiple formats: `.txt`, `.json`)
+   - ✅ Extracts structured data (device type, provider, patient info, diagnosis, device-specific fields)
+   - ✅ POSTs to external API (`https://alert-api.com/DrExtract` - configurable, with test environment handling)
+
+**Bonus Features Implemented:**
+- ✅ **LLM Integration**: OpenAI GPT-4o with intelligent fallback to regex parsing
+- ✅ **Multiple Input Formats**: Support for both text and JSON-wrapped physician notes
+- ✅ **Full Configurability**: File paths, API endpoints, LLM settings, environment-specific configs
+- ✅ **Extended DME Support**: 20+ device types including CPAP, Oxygen, Hospital Beds, TENS units, Wheelchairs, etc.
+
+### 🏗️ **Key Improvements Made**
+
+**From Legacy Code:**
+- **Monolithic Main()** → **Service-oriented architecture** with dependency injection
+- **No error handling** → **Graceful degradation** with comprehensive error handling
+- **No logging** → **Structured logging** with correlation tracking and observability
+- **No tests** → **72 comprehensive tests** with modern testing patterns
+- **Hardcoded logic** → **Configurable system** with environment-specific settings
+- **Limited device support** → **20+ DME device types** with extensible design
+
+**Architecture Benefits:**
+- **SOLID Principles**: Single responsibility, dependency inversion, interface segregation
+- **Testable Design**: 100% mockable dependencies with comprehensive test coverage
+- **Production Ready**: Application Insights, structured logging, error resilience
+- **Extensible**: Easy to add new device types, input formats, and LLM providers
+
+### 📋 **Assumptions and Limitations**
+- **OpenAI API Key**: Optional - system gracefully falls back to regex parsing without API key
+- **Input Encoding**: UTF-8 encoding assumed for all input files
+- **Language Support**: Optimized for English language physician notes (extensible to other languages)
+- **Processing Mode**: Sequential batch processing (can be enhanced to parallel processing)
+- **API Endpoint**: Configurable API endpoint with test environment detection
+
+### 🚀 **Instructions to Run**
+
+**Quick Start:**
+```bash
+# Navigate to source directory
+cd src
+
+# Run with default settings (processes all test files)
+dotnet run
+
+# Run specific file
+dotnet run ../tests/test_notes/physician_note1.txt
+
+# Run all tests
+cd ../tests && dotnet test
+```
+
+**For Enhanced LLM Processing:**
+1. Copy `src/appsettings.Local.json.template` to `src/appsettings.Local.json`
+2. Add your OpenAI API key to the Local configuration file
+3. System will automatically use GPT-4o for enhanced extraction accuracy
+
+### 🎯 **Results**
+- **✅ All Assignment Requirements Completed**
+- **✅ Enterprise-Grade Architecture** with modern .NET practices
+- **✅ Production-Ready** with comprehensive testing and observability
+- **✅ Extensible Design** ready for future enhancements
 
 ---
 

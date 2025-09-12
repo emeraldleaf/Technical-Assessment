@@ -8,6 +8,7 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+[Trait("Category", "Unit")]
 public class TextParserTests
 {
     private readonly TextParser _parser;

@@ -3,6 +3,7 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+[Trait("Category", "Integration")]
 public class FileReaderIntegrationTests
 {
     private readonly FileReader _fileReader = new();

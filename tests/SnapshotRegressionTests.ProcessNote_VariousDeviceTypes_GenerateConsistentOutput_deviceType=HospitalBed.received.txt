@@ -1,0 +1,7 @@
+﻿{
+  Device: Hospital Bed,
+  Diagnosis: mobility issues,
+  OrderingProvider: Dr. TestHospitalBed,
+  PatientName: John Doe,
+  Dob: Date_1
+}

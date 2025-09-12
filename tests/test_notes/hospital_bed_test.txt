@@ -1,8 +1,0 @@
-Patient Name: Robert Wilson
-DOB: 08/15/1978
-Diagnosis: Post-surgical recovery, limited mobility
-Ordering Physician: Dr. Martinez
-
-Patient requires hospital bed with adjustable height and side rails for safety. 
-Pressure relieving mattress needed due to extended bed rest and high risk of pressure sores.
-Patient will be bedridden for 6-8 weeks during recovery.

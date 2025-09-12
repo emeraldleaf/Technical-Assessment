@@ -1,8 +1,0 @@
-Patient Name: Dorothy Chen
-DOB: 12/03/1942
-Diagnosis: Severe arthritis, mobility impairment
-Ordering Physician: Dr. Anderson
-
-Patient needs mobility scooter for transportation and independence. 
-Unable to walk distances greater than 50 feet due to joint pain.
-Scooter should be suitable for both indoor and outdoor use.

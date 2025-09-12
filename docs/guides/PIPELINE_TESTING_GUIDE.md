@@ -1,6 +1,6 @@
-# 🚀 GitHub Actions CI/CD Pipeline Testing Guide
+# 🚀 Modern CI/CD Pipeline Testing Guide
 
-## Testing Methods for SignalBooster MVP Pipeline
+## Standard .NET Testing for SignalBooster MVP Pipeline
 
 ### ✅ **Method 1: Manual Step-by-Step Verification** (Recommended)
 
@@ -8,11 +8,10 @@ Test each pipeline step locally before pushing to GitHub:
 
 #### **Test Infrastructure Verification**
 ```bash
-cd tests
-echo "📊 Test Infrastructure Verification"
-echo "Input files: $(find test_notes -name "*.txt" -o -name "*.json" | wc -l)"
-echo "Expected files: $(find test_outputs -name "*_expected.json" | wc -l)"
-ls -la test_notes/ test_outputs/ | head -20
+# Verify test project structure
+echo "📊 Modern Test Infrastructure"
+dotnet test --list-tests | grep -E "(Unit|Integration|Performance|Regression)" | wc -l
+echo "Test categories available: Unit, Integration, Performance, Regression, Property"
 ```
 
 #### **Build Steps**
@@ -31,20 +30,30 @@ dotnet publish SignalBooster.csproj \
   --self-contained false
 ```
 
-#### **Integration Tests**
+#### **Modern Test Execution**
 ```bash
-cd tests
-chmod +x run-integration-tests.sh
-./run-integration-tests.sh --verbose
+# Run all tests
+dotnet test
+
+# Run specific categories
+dotnet test --filter "Category=Unit"           # Fast unit tests
+dotnet test --filter "Category=Integration"    # End-to-end tests
+dotnet test --filter "Category=Performance"    # Performance benchmarks
+
+# Run with verbose output
+dotnet test --verbosity normal
 ```
 
 #### **Test Coverage**
 ```bash
-cd tests
-dotnet test SignalBooster.Tests.csproj \
-  --collect:"XPlat Code Coverage" \
+# Generate coverage report
+dotnet test --collect:"XPlat Code Coverage" \
   --results-directory ./coverage \
   --verbosity minimal
+
+# Generate HTML coverage report (optional)
+dotnet tool install -g dotnet-reportgenerator-globaltool
+reportgenerator -reports:coverage/**/coverage.cobertura.xml -targetdir:coverage/html
 ```
 
 ---

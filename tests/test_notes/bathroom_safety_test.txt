@@ -1,8 +1,0 @@
-Patient Name: Eleanor Davis
-DOB: 11/28/1938
-Diagnosis: Hip replacement recovery, fall risk
-Ordering Physician: Dr. Park
-
-Patient needs bathroom safety equipment following hip surgery.
-Requires: raised toilet seat, shower chair, and commode for bedside use.
-High fall risk due to limited mobility and balance issues.

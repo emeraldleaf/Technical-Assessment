@@ -1,8 +1,0 @@
-Patient Name: James Cooper
-DOB: 09/07/1964
-Diagnosis: Chronic lower back pain, muscle spasms
-Ordering Physician: Dr. Garcia
-
-Patient requires TENS unit for pain management and electrical stimulation therapy.
-Chronic pain score 7/10, affecting daily activities and sleep.
-Non-pharmacological pain management preferred due to medication allergies.

@@ -8,6 +8,7 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+[Trait("Category", "Unit")]
 public class DeviceExtractorTests
 {
     private readonly IFileReader _fileReader = Substitute.For<IFileReader>();
@@ -29,6 +30,7 @@ public class DeviceExtractorTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     public async Task ProcessNoteAsync_NoOpenAIKey_UsesRegexParser()
     {
         var filePath = "test.txt";
@@ -48,6 +50,7 @@ public class DeviceExtractorTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     public async Task ProcessNoteAsync_WithOpenAIKey_UsesLlmParser()
     {
         // Create a new extractor with OpenAI configured

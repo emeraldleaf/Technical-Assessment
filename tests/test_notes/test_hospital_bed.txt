@@ -1,8 +1,0 @@
-Patient Name: Maria Gonzalez
-DOB: 03/15/1965
-Diagnosis: Post-surgical recovery, mobility limitations
-Ordering Physician: Dr. Stevens
-
-Patient requires hospital bed with side rails for home recovery. Pressure relieving mattress needed due to extended bed rest. Patient has risk of pressure sores.
-
-Additional equipment: raised toilet seat for bathroom safety.

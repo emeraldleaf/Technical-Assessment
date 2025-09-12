@@ -16,10 +16,14 @@ src/
 │   └── ApiClient.cs          # External API integration
 ├── Configuration/            # Strongly-typed settings
 │   └── SignalBoosterOptions.cs
-├── test_notes/              # Test input files
-├── test_outputs/            # Golden master test results
-├── .github/workflows/       # CI/CD pipeline
-└── run-integration-tests.sh # Test automation
+└── .github/workflows/       # CI/CD pipeline
+
+tests/
+├── TestHelpers/                    # Test data builders
+├── ModernDeviceExtractionTests.cs  # Integration tests
+├── PerformanceTests.cs             # Performance benchmarks
+├── SnapshotRegressionTests.cs      # Regression testing
+└── SignalBooster.IntegrationTests.csproj
 ```
 
 ### SOLID Principles Implementation
@@ -109,28 +113,26 @@ private static List<string>? ExtractAddOns(string deviceType, string text)
 }
 ```
 
-**Step 3: Create Test Files**
-```bash
-# Create test file
-echo "Patient needs glucose monitor with test strips for diabetes management." > test_notes/glucose_monitor_test.txt
-
-# Create expected output
-cat > test_outputs/glucose_monitor_expected.json << EOF
-{
-  "device": "Blood Glucose Monitor",
-  "add_ons": ["test strips"],
-  "diagnosis": "diabetes"
-}
-EOF
+**Step 3: Create Test Case**
+Add a test case to `TestDataFactory.cs`:
+```csharp
+public static readonly (string Text, DeviceOrder Expected) GlucoseMonitor =
+    PhysicianNoteBuilder.Create()
+        .WithPatient("Jane Smith", "05/15/1970")
+        .WithDiagnosis("Type 2 Diabetes")
+        .WithProvider("Dr. Johnson")
+        .WithDevice("Blood Glucose Monitor")
+        .WithAddOns("test strips", "lancets")
+        .BuildTextAndExpected();
 ```
 
 **Step 4: Run Tests**
 ```bash
-# Test single file
-dotnet run test_notes/glucose_monitor_test.txt
+# Run all tests
+dotnet test
 
-# Run full regression test suite
-./run-integration-tests.sh
+# Run specific test categories
+dotnet test --filter "Category=Integration"
 ```
 
 ### 2. Adding New Input Formats
@@ -166,47 +168,53 @@ public async Task<string> ReadFileAsync(string filePath)
 
 ---
 
-## 🧪 Testing Strategy
+## 🧪 Modern Testing Strategy
 
-### Golden Master Testing Framework
+### In-Memory Testing Framework
 
-The project uses **Golden Master Testing** for comprehensive regression detection:
+The project uses **modern in-memory testing** with multiple test categories:
 
 ```bash
-# Run all tests with regression detection
-./run-integration-tests.sh
+# Run all tests
+dotnet test
 
-# Options available:
-./run-integration-tests.sh --batch-only    # Batch processing only
-./run-integration-tests.sh --skip-batch    # Unit tests only  
-./run-integration-tests.sh --verbose       # Detailed output
+# Run specific categories
+dotnet test --filter "Category=Unit"           # Fast unit tests
+dotnet test --filter "Category=Integration"    # End-to-end tests
+dotnet test --filter "Category=Performance"    # Performance benchmarks
+dotnet test --filter "Category=Regression"     # Snapshot testing
 ```
 
-### Test File Structure
-- **Input Files**: `test_notes/*.{txt,json}` - Test cases for processing
-- **Expected Outputs**: `test_outputs/*_expected.json` - Golden master baselines
-- **Actual Outputs**: `test_outputs/*_actual.json` - Generated during testing
+### Test Architecture
+- **Unit Tests**: Fast business logic validation with mocks
+- **Integration Tests**: End-to-end workflow testing with in-memory file systems  
+- **Regression Tests**: Snapshot-based change detection with Verify.Xunit
+- **Performance Tests**: Benchmarking and scalability validation
+- **Property Tests**: Random input and edge case testing
 
 ### Adding New Test Cases
 
-1. **Create Input File**:
-   ```bash
-   echo "Your test content here" > test_notes/new_device_test.txt
-   ```
+1. **Unit Tests**: Add to existing test classes with `[Trait("Category", "Unit")]`
+2. **Integration Tests**: Use `TestDataFactory` and `PhysicianNoteBuilder` for structured data
+3. **Regression Tests**: Add snapshot tests to `SnapshotRegressionTests.cs`
 
-2. **Generate Expected Output**:
-   ```bash
-   # Process file to get actual output
-   dotnet run test_notes/new_device_test.txt
-   
-   # Copy to expected baseline (after verifying correctness)
-   cp output.json test_outputs/new_device_expected.json
-   ```
-
-3. **Run Regression Tests**:
-   ```bash
-   ./run-integration-tests.sh
-   ```
+Example:
+```csharp
+[Fact]
+[Trait("Category", "Integration")]
+public async Task ProcessNote_NewDevice_ExtractsCorrectly()
+{
+    // Arrange - Use test builder
+    var testData = PhysicianNoteBuilder.Create()
+        .WithDevice("New Device")
+        .WithDiagnosis("Test condition")
+        .BuildTextAndExpected();
+    
+    // Act & Assert - In-memory testing
+    var result = await ProcessNoteInMemory(testData.Text);
+    result.Should().BeEquivalentTo(testData.Expected);
+}
+```
 
 ---
 
@@ -529,10 +537,10 @@ public async Task ExtractDeviceOrder_OxygenTankNote_ReturnsCorrectDevice()
 - Monitor quota usage in OpenAI dashboard
 - Application automatically falls back to regex
 
-**2. Test Failures**
-- Run `./run-integration-tests.sh --verbose` for detailed output
-- Check if actual outputs match expected baselines
-- Verify test files exist in `test_notes/`
+**2. Test Failures**  
+- Run `dotnet test --verbosity normal` for detailed output
+- Use snapshot testing to see exact differences
+- Check test categories with `dotnet test --list-tests`
 
 **3. Build Errors**
 - Ensure .NET 8.0 SDK is installed
@@ -544,7 +552,7 @@ public async Task ExtractDeviceOrder_OxygenTankNote_ReturnsCorrectDevice()
 1. **Enable verbose logging**: Set log level to `Debug` in appsettings.json
 2. **Use correlation IDs**: Track requests end-to-end in logs
 3. **Check Application Insights**: Use KQL queries for production issues
-4. **Golden Master Diffs**: Compare actual vs expected outputs for test failures
+4. **Snapshot Comparisons**: Review snapshot diffs for regression test failures
 
 ---
 
@@ -552,7 +560,7 @@ public async Task ExtractDeviceOrder_OxygenTankNote_ReturnsCorrectDevice()
 
 - **Architecture**: Review `Models/` and `Services/` folders for patterns
 - **Configuration**: Check `Configuration/SignalBoosterOptions.cs`
-- **Testing**: See `run-integration-tests.sh` and test file structure
+- **Testing**: Review modern test classes and `TestHelpers/` directory
 - **Monitoring**: Use `../SignalBooster-Queries.kql` for Application Insights
 - **CI/CD**: Review `.github/workflows/ci.yml`
 
