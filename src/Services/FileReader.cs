@@ -17,15 +17,34 @@ public class FileReader : IFileReader
         if (!_fileSystem.File.Exists(filePath))
             throw new FileNotFoundException($"File not found: {filePath}");
         
-        var content = await _fileSystem.File.ReadAllTextAsync(filePath);
+        var fileInfo = _fileSystem.FileInfo.New(filePath);
         
-        // Support JSON-wrapped notes
-        if (filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        // Use StreamReader for large files (>1MB) for better memory efficiency
+        if (fileInfo.Length > 1_048_576) // 1MB threshold
         {
-            return ExtractNoteFromJson(content);
+            using var stream = _fileSystem.File.OpenRead(filePath);
+            using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, true, bufferSize: 4096);
+            var content = await reader.ReadToEndAsync();
+            
+            if (filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                return ExtractNoteFromJson(content);
+            }
+            
+            return content;
         }
-        
-        return content;
+        else
+        {
+            // Use ReadAllTextAsync for smaller files
+            var content = await _fileSystem.File.ReadAllTextAsync(filePath);
+            
+            if (filePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                return ExtractNoteFromJson(content);
+            }
+            
+            return content;
+        }
     }
     
     private static string ExtractNoteFromJson(string jsonContent)

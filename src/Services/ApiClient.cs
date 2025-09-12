@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SignalBooster.Configuration;
 using SignalBooster.Models;
+using System.Net;
 
 namespace SignalBooster.Services;
 
@@ -37,7 +38,7 @@ public class ApiClient : IApiClient
             return;
         }
 
-        try
+        await RetryWithExponentialBackoff(async () =>
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             
@@ -68,17 +69,64 @@ public class ApiClient : IApiClient
                 _logger.LogInformation("[{Class}.{Method}] Step 3: Successfully posted device order. Status: {StatusCode}, Duration: {DurationMs}ms",
                     nameof(ApiClient), nameof(PostDeviceOrderAsync), response.StatusCode, stopwatch.ElapsedMilliseconds);
             }
+            else if (IsRetryableStatusCode(response.StatusCode))
+            {
+                _logger.LogWarning("[{Class}.{Method}] Retryable error. Status: {StatusCode}, Duration: {DurationMs}ms, Reason: {ReasonPhrase}",
+                    nameof(ApiClient), nameof(PostDeviceOrderAsync), response.StatusCode, stopwatch.ElapsedMilliseconds, response.ReasonPhrase);
+                throw new HttpRequestException($"Retryable HTTP error: {response.StatusCode}");
+            }
             else
             {
                 _logger.LogWarning("[{Class}.{Method}] Step 3: Failed to post device order. Status: {StatusCode}, Duration: {DurationMs}ms, Reason: {ReasonPhrase}",
                     nameof(ApiClient), nameof(PostDeviceOrderAsync), response.StatusCode, stopwatch.ElapsedMilliseconds, response.ReasonPhrase);
             }
-        }
-        catch (Exception ex)
+        }, deviceOrder.Device, deviceOrder.PatientName ?? "Unknown");
+    }
+
+    private async Task RetryWithExponentialBackoff(Func<Task> operation, string device, string patientName)
+    {
+        for (int attempt = 0; attempt <= _apiOptions.RetryCount; attempt++)
         {
-            _logger.LogWarning(ex, "[{Class}.{Method}] Step FAILED: Failed to post device order to API - continuing execution. Error: {ErrorMessage}",
-                nameof(ApiClient), nameof(PostDeviceOrderAsync), ex.Message);
-            // Don't throw - this is not critical for MVP operation
+            try
+            {
+                await operation();
+                return;
+            }
+            catch (HttpRequestException ex) when (attempt < _apiOptions.RetryCount)
+            {
+                var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt));
+                _logger.LogWarning("[{Class}.{Method}] Attempt {Attempt} failed for Device: {Device}, Patient: {Patient}. Retrying in {DelayMs}ms. Error: {Error}",
+                    nameof(ApiClient), nameof(PostDeviceOrderAsync), attempt + 1, device, patientName, delay.TotalMilliseconds, ex.Message);
+                
+                await Task.Delay(delay);
+            }
+            catch (TaskCanceledException) when (attempt < _apiOptions.RetryCount)
+            {
+                var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt));
+                _logger.LogWarning("[{Class}.{Method}] Timeout on attempt {Attempt} for Device: {Device}, Patient: {Patient}. Retrying in {DelayMs}ms",
+                    nameof(ApiClient), nameof(PostDeviceOrderAsync), attempt + 1, device, patientName, delay.TotalMilliseconds);
+                
+                await Task.Delay(delay);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[{Class}.{Method}] Non-retryable error for Device: {Device}, Patient: {Patient}. Error: {Error}",
+                    nameof(ApiClient), nameof(PostDeviceOrderAsync), device, patientName, ex.Message);
+                return;
+            }
         }
+
+        _logger.LogError("[{Class}.{Method}] All retry attempts exhausted for Device: {Device}, Patient: {Patient}",
+            nameof(ApiClient), nameof(PostDeviceOrderAsync), device, patientName);
+    }
+
+    private static bool IsRetryableStatusCode(HttpStatusCode statusCode)
+    {
+        return statusCode == HttpStatusCode.InternalServerError ||
+               statusCode == HttpStatusCode.BadGateway ||
+               statusCode == HttpStatusCode.ServiceUnavailable ||
+               statusCode == HttpStatusCode.GatewayTimeout ||
+               statusCode == HttpStatusCode.TooManyRequests ||
+               statusCode == HttpStatusCode.RequestTimeout;
     }
 }
