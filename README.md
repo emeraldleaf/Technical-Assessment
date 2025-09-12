@@ -10,18 +10,17 @@ A production-ready application for DME (Durable Medical Equipment) device order 
 
 ### Setup
 ```bash
-# Clone and build
-cd src
-dotnet build
+# Build from root (using solution file)
+dotnet build SignalBooster.sln
 
 # Run with default batch processing
-dotnet run
+dotnet run --project src
 
 # Process single file
-dotnet run ../tests/test_notes/physician_note1.txt
+dotnet run --project src ../tests/test_notes/physician_note1.txt
 
 # Run tests
-cd ../tests && dotnet test
+dotnet test
 ```
 
 ### OpenAI API Configuration (Optional)
@@ -77,6 +76,8 @@ Clean service-oriented design with dependency injection:
 - **Multiple Formats**: Supports .txt and .json input files
 - **20+ Device Types**: CPAP, Oxygen, Hospital Beds, Wheelchairs, etc.
 - **Batch Processing**: Process entire directories
+- **Fault Tolerance**: API retry logic with exponential backoff
+- **Performance Optimized**: StreamReader for large files (>1MB)
 - **Comprehensive Testing**: 89 tests across 5 categories (100% pass rate)
 - **Production Ready**: Structured logging, error handling, observability
 
@@ -109,7 +110,10 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
     },
     "Api": {
       "BaseUrl": "https://alert-api.com",
-      "Endpoint": "/device-orders"
+      "Endpoint": "/device-orders",
+      "TimeoutSeconds": 30,
+      "RetryCount": 3,
+      "EnableApiPosting": true
     },
     "Files": {
       "BatchProcessingMode": true,
@@ -138,16 +142,17 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
 
 ### Instructions to Run
 ```bash
-# Navigate to source and run
-cd src && dotnet run
+# Build and run from root
+dotnet build SignalBooster.sln
+dotnet run --project src
 
 # Run tests
-cd ../tests && dotnet test
+dotnet test
 
-# For LLM enhancement: Add OpenAI API key to appsettings.Local.json
+# For LLM enhancement: Add OpenAI API key to src/appsettings.Local.json
 ```
 
-**For detailed verification steps, see [docs/VERIFICATION_GUIDE.md](docs/VERIFICATION_GUIDE.md)**
+**For detailed verification steps, see [VERIFICATION_GUIDE.md](VERIFICATION_GUIDE.md)**
 
 ### Assumptions & Architecture Decisions
 - **Console Application**: Built as console app for batch processing and simple deployment
