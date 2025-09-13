@@ -1,6 +1,6 @@
-# ✅ SignalBooster - Quick Verification Guide
+# SignalBooster - Quick Verification Guide
 
-## 🎯 Verification Checklist (10 minutes)
+## Verification Checklist (10 minutes)
 
 - [ ] **Builds cleanly** without errors
 - [ ] **Tests pass** (89 tests)
@@ -9,21 +9,24 @@
 
 ---
 
-## 🚀 **1. Build & Run** (3 minutes)
+## **1. Build & Run** (3 minutes)
 
 ```bash
 # Build and test from root
 dotnet build SignalBooster.sln
 dotnet test
 
+# Run tests with coverage (matches CI/CD pipeline)
+dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
+
 # Expected Results Explained:
-# ✅ 89/89 tests PASS (normal operation)
-# ⚠️ Snapshot tests may "fail" ONLY on first run (creates baseline files)
+# 89/89 tests PASS (normal operation)
+# Snapshot tests may "fail" ONLY on first run (creates baseline files)
 ```
 
 ### Test Results Breakdown:
 
-**✅ Expected to PASS (All 89 tests):**
+**Expected to PASS (All 89 tests):**
 - Unit Tests: All core business logic
 - Integration Tests: File processing workflows  
 - Performance Tests: Speed and memory benchmarks
@@ -36,10 +39,10 @@ Total tests: 89
      Passed: 89
      Failed: 0
      Skipped: 0
-✅ All tests pass - system is working correctly
+All tests pass - system is working correctly
 ```
 
-**⚠️ First-Run Snapshot Behavior:**
+**First-Run Snapshot Behavior:**
 - **Snapshot Tests**: May show "failures" on very first run to create baseline `.verified.txt` files
 - **Normal**: These files are created once, then subsequent runs compare against them
 
@@ -52,7 +55,7 @@ cd src && dotnet run
 
 ---
 
-## 🧪 **2. Sample Verification** (2 minutes)
+## **2. Sample Verification** (2 minutes)
 
 ```bash
 # Test single file (must be from src directory)
@@ -77,7 +80,7 @@ cat output.json
 
 ---
 
-## ⚙️ **3. Optional: OpenAI Setup** (5 minutes)
+## **3. Optional: OpenAI Setup** (5 minutes)
 
 For enhanced LLM processing:
 
@@ -94,7 +97,7 @@ dotnet run --project src
 
 ---
 
-## 🔍 **Troubleshooting**
+## **Troubleshooting**
 
 ### Build Errors
 ```bash
@@ -117,25 +120,25 @@ dotnet clean && dotnet restore && dotnet build
 
 ---
 
-## ✅ Success Criteria
+## Success Criteria
 
 **Minimum (Must Pass):**
-- ✅ Builds without errors  
-- ✅ Processes physician_note1.txt correctly
-- ✅ Generates valid JSON output
-- ✅ All 89 tests pass
+- Builds without errors  
+- Processes physician_note1.txt correctly
+- Generates valid JSON output
+- All 89 tests pass
 
 **What's Normal:**
-- ✅ 100% test pass rate (89/89)
-- ⚠️ API posting errors (demo endpoint doesn't exist)
-- ⚠️ Snapshot tests may create baseline files on first run
+- 100% test pass rate (89/89)
+- API posting errors (demo endpoint doesn't exist)
+- Snapshot tests may create baseline files on first run
 
 **Complete Verification:**
-- ✅ All core functionality works
-- ✅ Batch processing completes
-- ✅ LLM integration functional (with API key)
-- ✅ Multiple device types supported
+- All core functionality works
+- Batch processing completes
+- LLM integration functional (with API key)
+- Multiple device types supported
 
 ---
 
-🎉 **If these steps pass, SignalBooster is working correctly!**
+**If these steps pass, SignalBooster is working correctly!**

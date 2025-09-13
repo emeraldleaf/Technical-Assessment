@@ -373,3 +373,6 @@ docker-compose.override.yml
 .cache/
 node_modules/
 .npm/
+
+# Assignment folder
+assignment/
