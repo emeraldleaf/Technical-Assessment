@@ -1,0 +1,7 @@
+﻿{
+  Device: Oxygen Tank,
+  Diagnosis: COPD,
+  OrderingProvider: Dr. TestOxygenTank,
+  PatientName: John Doe,
+  Dob: Date_1
+}
