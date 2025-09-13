@@ -11,15 +11,30 @@
 
 ## **1. Build & Run** (3 minutes)
 
+### Build and Test Commands
+
+**Unix/Linux/macOS:**
 ```bash
 # Build and test from root
 dotnet build SignalBooster.sln
 dotnet test
 
-# Run tests with coverage (matches CI/CD pipeline)
+# Run tests with coverage (matches CI pipeline)
 dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
+```
 
-# Expected Results Explained:
+**Windows (Command Prompt or PowerShell):**
+```cmd
+REM Build and test from root
+dotnet build SignalBooster.sln
+dotnet test
+
+REM Run tests with coverage (matches CI pipeline)  
+dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
+```
+
+**Expected Results:**
+```
 # 89/89 tests PASS (normal operation)
 # Snapshot tests may "fail" ONLY on first run (creates baseline files)
 ```
@@ -46,6 +61,9 @@ All tests pass - system is working correctly
 - **Snapshot Tests**: May show "failures" on very first run to create baseline `.verified.txt` files
 - **Normal**: These files are created once, then subsequent runs compare against them
 
+### Batch Processing Mode (Default)
+
+**Unix/Linux/macOS:**
 ```bash
 # Run application (must be from src directory for config files)
 cd src && dotnet run
@@ -53,16 +71,51 @@ cd src && dotnet run
 # Expected: Processes test files, generates JSON outputs
 ```
 
+**Windows:**
+```cmd
+REM Run application (must be from src directory for config files)
+cd src
+dotnet run
+
+REM Expected: Processes test files, generates JSON outputs
+```
+
 ---
 
 ## **2. Sample Verification** (2 minutes)
 
+### Single File Processing
+
+**Method 1: Environment Variable Override (Recommended)**
 ```bash
-# Test single file (must be from src directory)
-cd src && dotnet run ../tests/test_notes/physician_note1.txt
+# Unix/Linux/macOS
+cd src && SIGNALBOOSTER_Files__BatchProcessingMode=false dotnet run ../tests/test_notes/physician_note1.txt
+
+# Windows Command Prompt
+cd src
+set SIGNALBOOSTER_Files__BatchProcessingMode=false
+dotnet run ../tests/test_notes/physician_note1.txt
+
+# Windows PowerShell
+cd src
+$env:SIGNALBOOSTER_Files__BatchProcessingMode="false"
+dotnet run ../tests/test_notes/physician_note1.txt
 
 # Check output
-cat output.json
+cat output.json        # Unix/Linux/macOS
+type output.json       # Windows
+```
+
+**Method 2: Configuration Override**
+```bash
+# Create local config override
+echo '{"SignalBooster":{"Files":{"BatchProcessingMode":false}}}' > src/appsettings.Local.json
+
+# Windows PowerShell
+'{"SignalBooster":{"Files":{"BatchProcessingMode":false}}}' | Out-File -FilePath src/appsettings.Local.json
+
+# Then run normally
+cd src && dotnet run ../tests/test_notes/physician_note1.txt
 ```
 
 **Expected Output:**
@@ -84,9 +137,34 @@ cat output.json
 
 For enhanced LLM processing:
 
+**Unix/Linux/macOS:**
 ```bash
 # Copy template
 cp src/appsettings.Local.json.template src/appsettings.Local.json
+
+# Edit file and add your OpenAI API key:
+# Change "ApiKey": "" to "ApiKey": "sk-your-actual-api-key"
+
+# Run again for LLM-powered extraction
+dotnet run --project src
+```
+
+**Windows Command Prompt:**
+```cmd
+REM Copy template
+copy src\appsettings.Local.json.template src\appsettings.Local.json
+
+REM Edit file and add your OpenAI API key:
+REM Change "ApiKey": "" to "ApiKey": "sk-your-actual-api-key"
+
+REM Run again for LLM-powered extraction
+dotnet run --project src
+```
+
+**Windows PowerShell:**
+```powershell
+# Copy template
+Copy-Item src/appsettings.Local.json.template src/appsettings.Local.json
 
 # Edit file and add your OpenAI API key:
 # Change "ApiKey": "" to "ApiKey": "sk-your-actual-api-key"
@@ -100,8 +178,17 @@ dotnet run --project src
 ## **Troubleshooting**
 
 ### Build Errors
+
+**Unix/Linux/macOS:**
 ```bash
 dotnet clean && dotnet restore && dotnet build
+```
+
+**Windows:**
+```cmd
+dotnet clean
+dotnet restore  
+dotnet build
 ```
 
 ### Missing OpenAI Key

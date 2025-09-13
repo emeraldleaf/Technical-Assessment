@@ -87,7 +87,7 @@ Clean service-oriented design with dependency injection:
 # Run all tests (89 total)
 dotnet test
 
-# Run tests with coverage (matches CI/CD pipeline)
+# Run tests with coverage (matches CI pipeline)
 dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
 
 # Expected: All 89 tests pass (100% success rate)
