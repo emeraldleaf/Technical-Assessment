@@ -45,7 +45,7 @@ public class DeviceExtractorTests
         Assert.Equal("CPAP", result.Device);
         await _fileReader.Received(1).ReadTextAsync(filePath);
         _textParser.Received(1).ParseDeviceOrder(noteText);
-        _textParser.DidNotReceive().ParseDeviceOrderAsync(Arg.Any<string>());
+        await _textParser.DidNotReceive().ParseDeviceOrderAsync(Arg.Any<string>());
         await _apiClient.Received(1).PostDeviceOrderAsync(expectedOrder);
     }
 

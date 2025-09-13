@@ -31,7 +31,7 @@ public class TextParserTests
         
         Assert.Equal("CPAP", result.Device);
         Assert.Equal("full face", result.MaskType);
-        Assert.Contains("humidifier", result.AddOns);
+        Assert.Contains("humidifier", result.AddOns ?? Array.Empty<string>());
         Assert.Equal("AHI > 20", result.Qualifier);
         Assert.Equal("Dr. Cameron", result.OrderingProvider);
     }
