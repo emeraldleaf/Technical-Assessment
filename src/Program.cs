@@ -152,9 +152,8 @@ class Program
     private static IConfiguration BuildConfiguration()
     {
         return new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)         // Base config
-            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true) // Dev overrides
             .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)   // Local overrides
             .AddEnvironmentVariables("SIGNALBOOSTER_")                                     // Production secrets
             .Build();

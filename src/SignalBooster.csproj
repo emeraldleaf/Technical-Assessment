@@ -28,4 +28,9 @@
     <PackageReference Include="Polly" Version="8.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="appsettings.Local.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

@@ -13,11 +13,11 @@ A production-ready application for DME (Durable Medical Equipment) device order 
 # Build from root (using solution file)
 dotnet build SignalBooster.sln
 
-# Run with default batch processing
-dotnet run --project src
+# Process single file (default mode)
+dotnet run --project src tests/test_notes/physician_note1.txt
 
-# Process single file
-dotnet run --project src ../tests/test_notes/physician_note1.txt
+# Run with batch processing (processes all files in configured directory)
+dotnet run --project src
 
 # Run tests
 dotnet test
@@ -27,7 +27,7 @@ dotnet test
 ```bash
 # Copy template and add your API key
 cp src/appsettings.Local.json.template src/appsettings.Local.json
-# Edit appsettings.Local.json with your OpenAI API key
+# Edit src/appsettings.Local.json with your OpenAI API key
 ```
 
 ## Sample Input/Output
@@ -54,6 +54,31 @@ Patient requires oxygen tank with 2 L flow rate for sleep and exertion.
   "dob": "04/12/1952"
 }
 ```
+
+## Verifying It Works
+
+### Single File Mode (Default)
+After running `dotnet run --project src tests/test_notes/physician_note1.txt`, check:
+
+✅ **Console shows:** `Processing completed successfully`
+✅ **File created:** `output.json` in project root with extracted device data
+✅ **Logs created:** `logs/signal-booster-YYYYMMDD.txt` with detailed processing info
+✅ **API simulation:** Console shows "Test environment detected - simulating API call"
+
+### Batch Mode
+Set `"BatchProcessingMode": true` in `src/appsettings.json`, then run `dotnet run --project src`. Check:
+
+✅ **Console shows:** `Batch processing completed: Successfully processed X files`
+✅ **File summary:** Console lists each processed file (e.g., `✓ physician_note1 → Oxygen Tank for Harold Finch`)
+✅ **Logs created:** Detailed processing info for each file in `logs/`
+✅ **No output.json:** Batch mode only logs and posts to API (no individual output files)
+
+### Expected Data Extraction
+Both modes should extract structured data like:
+- **Device Type:** Oxygen Tank, CPAP, Hospital Bed, etc.
+- **Patient Info:** Name, DOB, diagnosis
+- **Provider:** Ordering physician name
+- **Device Details:** Flow rates, settings, usage instructions
 
 ## Architecture
 
@@ -119,7 +144,7 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
       "EnableApiPosting": true
     },
     "Files": {
-      "BatchProcessingMode": true,
+      "BatchProcessingMode": false,
       "BatchInputDirectory": "../tests/test_notes"
     }
   }
