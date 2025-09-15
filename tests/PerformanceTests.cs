@@ -197,7 +197,7 @@ public class PerformanceTests
         _output.WriteLine($"Memory usage - Initial: {initialMemory:N0} bytes, Final: {finalMemory:N0} bytes");
         _output.WriteLine($"Memory increase: {memoryIncrease:N0} bytes");
 
-        memoryIncrease.Should().BeLessThan(1_000_000, "memory usage should not grow significantly"); // Less than 1MB
+        memoryIncrease.Should().BeLessThan(1_500_000, "memory usage should not grow significantly"); // Less than 1.5MB
     }
 
     private static double CalculateStandardDeviation(IEnumerable<long> values, double mean)

@@ -216,11 +216,14 @@ public class DeviceExtractor
         }
 
         // File discovery using configurable extensions
-        var files = new List<string>();
+        var files = new HashSet<string>();
         foreach (var extension in _options.Files.SupportedExtensions)
         {
             var pattern = $"*{extension}";
-            files.AddRange(Directory.GetFiles(inputDirectory, pattern));
+            foreach (var file in Directory.GetFiles(inputDirectory, pattern))
+            {
+                files.Add(file);
+            }
         }
 
         // Deterministic ordering for consistent batch processing

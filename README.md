@@ -13,11 +13,11 @@ A production-ready application for DME (Durable Medical Equipment) device order 
 # Build from root (using solution file)
 dotnet build SignalBooster.sln
 
-# Process single file (default mode)
-dotnet run --project src tests/test_notes/physician_note1.txt
-
-# Run with batch processing (processes all files in configured directory)
+# Run the application (mode determined by BatchProcessingMode setting in appsettings.json)
 dotnet run --project src
+
+# Optional: Override with specific file path in single file mode
+# dotnet run --project src tests/test_notes/physician_note1.txt
 
 # Run tests
 dotnet test
@@ -60,18 +60,22 @@ Patient requires oxygen tank with 2 L flow rate for sleep and exertion.
 ### Single File Mode (Default)
 After running `dotnet run --project src tests/test_notes/physician_note1.txt`, check:
 
-✅ **Console shows:** `Processing completed successfully`
-✅ **File created:** `output.json` in project root with extracted device data
-✅ **Logs created:** `logs/signal-booster-YYYYMMDD.txt` with detailed processing info
-✅ **API simulation:** Console shows "Test environment detected - simulating API call"
+- ✅ **Console shows:** `Processing completed successfully`
+- ✅ **File created:** `output.json` in project root with extracted device data
+- ✅ **Logs created:** `logs/signal-booster-YYYYMMDD.txt` with detailed processing info
+- ✅ **API simulation:** Console shows "Test environment detected - simulating API call"
 
 ### Batch Mode
-Set `"BatchProcessingMode": true` in `src/appsettings.json`, then run `dotnet run --project src`. Check:
+To switch between modes, simply change `"BatchProcessingMode"` in `src/appsettings.json`:
+- `"BatchProcessingMode": true` - Processes all files in `BatchInputDirectory`
+- `"BatchProcessingMode": false` - Processes single file from `DefaultInputPath` (or command line override)
 
-✅ **Console shows:** `Batch processing completed: Successfully processed X files`
-✅ **File summary:** Console lists each processed file (e.g., `✓ physician_note1 → Oxygen Tank for Harold Finch`)
-✅ **Logs created:** Detailed processing info for each file in `logs/`
-✅ **No output.json:** Batch mode only logs and posts to API (no individual output files)
+Then run `dotnet run --project src`. Check:
+
+- ✅ **Console shows:** `Batch processing completed: Successfully processed X files`
+- ✅ **File summary:** Console lists each processed file (e.g., `✓ physician_note1 → Oxygen Tank for Harold Finch`)
+- ✅ **Logs created:** Detailed processing info for each file in `logs/`
+- ✅ **No output.json:** Batch mode only logs and posts to API (no individual output files)
 
 ### Expected Data Extraction
 Both modes should extract structured data like:
