@@ -86,7 +86,7 @@ Both modes should extract structured data like:
 
 ## Architecture
 
-Clean service-oriented design with dependency injection:
+Layered service-oriented design with dependency injection:
 
 ```
 ├── Models/DeviceOrder.cs           # Data structures
@@ -165,7 +165,7 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
 - **Framework**: .NET 8.0 with xUnit testing
 
 ### Assignment Requirements ✅
-1. **Refactored Logic**: Clean service architecture with dependency injection
+1. **Refactored Logic**: Layered service architecture with dependency injection
 2. **Logging & Error Handling**: Structured logging with graceful LLM fallback
 3. **Unit Tests**: 89 tests across Unit, Integration, Performance categories
 4. **Clear Comments**: XML documentation throughout
