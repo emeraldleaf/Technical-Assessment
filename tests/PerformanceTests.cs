@@ -12,6 +12,25 @@ using Xunit.Abstractions;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Performance tests for DeviceExtractor and TextParser to ensure scalability
+///
+/// Test Categories:
+/// - Large file processing performance (1MB+ physician notes)
+/// - Batch processing throughput validation
+/// - Memory usage patterns under load
+/// - Response time benchmarks for different parsing methods
+///
+/// Performance Criteria:
+/// - Single file processing: &lt; 2 seconds for files up to 1MB
+/// - Batch processing: Linear scaling with file count
+/// - Memory usage: Stable allocation patterns, no leaks
+/// - Regex parsing: &lt; 100ms for typical notes
+///
+/// Test Output:
+/// - Execution times logged to test output for monitoring
+/// - Performance assertions fail if thresholds are exceeded
+/// </summary>
 [Trait("Category", "Performance")]
 public class PerformanceTests
 {

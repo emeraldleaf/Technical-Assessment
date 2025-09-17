@@ -11,6 +11,26 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Property-based tests using Bogus for fuzz testing and edge case discovery
+///
+/// Test Categories:
+/// - Randomized input validation with generated physician notes
+/// - Invariant verification across thousands of test cases
+/// - Edge case discovery through property-based testing
+/// - Robustness testing with malformed/unexpected inputs
+///
+/// Testing Approach:
+/// - Bogus library generates realistic but varied test data
+/// - Focus on properties that should always hold true
+/// - Discover edge cases that traditional unit tests might miss
+/// - Validate parser stability with unpredictable inputs
+///
+/// Properties Tested:
+/// - Parser never throws exceptions (robustness)
+/// - Output format consistency regardless of input variation
+/// - Device type extraction accuracy with noisy data
+/// </summary>
 [Trait("Category", "Property")]
 public class PropertyBasedTests
 {

@@ -10,6 +10,27 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Snapshot regression tests using Verify framework for change detection
+///
+/// Test Categories:
+/// - Baseline snapshot creation for parsing results
+/// - Regression detection when parsing logic changes
+/// - Output format stability verification
+/// - Integration test validation with real parser components
+///
+/// Testing Strategy:
+/// - Verify framework captures and compares parsing outputs
+/// - Snapshots stored as .received.txt files for review
+/// - Automatic baseline creation on first test run
+/// - Fail-fast detection of unintended parsing changes
+///
+/// Workflow:
+/// - First run: Creates baseline snapshots for approval
+/// - Subsequent runs: Compares against approved baselines
+/// - Changes require manual review and approval of new snapshots
+/// - Prevents accidental regression in parsing accuracy
+/// </summary>
 [UsesVerify]
 [Trait("Category", "Regression")]
 public class SnapshotRegressionTests

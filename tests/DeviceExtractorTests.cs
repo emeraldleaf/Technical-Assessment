@@ -8,6 +8,20 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Unit tests for DeviceExtractor class - the main orchestration service
+///
+/// Test Categories:
+/// - Processing flow validation (single file and batch modes)
+/// - OpenAI vs Regex parser selection logic
+/// - Error handling and logging verification
+/// - Dependency coordination (FileReader, TextParser, ApiClient)
+///
+/// Mocking Strategy:
+/// - All dependencies mocked using NSubstitute for isolation
+/// - Focus on testing orchestration logic, not implementation details
+/// - Verify correct method calls and parameter passing
+/// </summary>
 [Trait("Category", "Unit")]
 public class DeviceExtractorTests
 {
