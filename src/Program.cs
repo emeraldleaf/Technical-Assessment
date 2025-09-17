@@ -18,7 +18,7 @@ namespace SignalBooster;
 /// SignalBooster MVP - DME (Durable Medical Equipment) Processing Application
 /// 
 /// Architecture Overview:
-/// - Clean Architecture with separation of concerns
+/// - Layered Service Architecture with separation of concerns
 /// - Dependency Injection for loose coupling and testability
 /// - Configuration-driven behavior for flexibility
 /// - Structured logging with Application Insights integration

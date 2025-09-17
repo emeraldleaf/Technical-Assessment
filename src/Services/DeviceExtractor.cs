@@ -15,7 +15,7 @@ namespace SignalBooster.Services;
 /// - Strategy Pattern: Supports both single-file and batch processing strategies
 /// 
 /// Architecture Role:
-/// - Application Service in Clean Architecture
+/// - Application Service in Layered Service Architecture
 /// - Coordinates between domain logic (parsing) and infrastructure (file I/O, API calls)
 /// - Handles cross-cutting concerns: logging, error handling, configuration
 /// 
