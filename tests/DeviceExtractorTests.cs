@@ -39,8 +39,13 @@ public class DeviceExtractorTests
         {
             OpenAI = new OpenAIOptions { ApiKey = "" } // No API key = use regex parser
         });
-        
+
         _extractor = new DeviceExtractor(_fileReader, _textParser, _apiClient, _options, _logger);
+
+        // Clear any received calls to ensure clean test state
+        _fileReader.ClearReceivedCalls();
+        _textParser.ClearReceivedCalls();
+        _apiClient.ClearReceivedCalls();
     }
 
     [Fact]
@@ -57,10 +62,24 @@ public class DeviceExtractorTests
         var result = await _extractor.ProcessNoteAsync(filePath);
 
         Assert.Equal("CPAP", result.Device);
+        Received.InOrder(() =>
+        {
+            _fileReader.ReadTextAsync(filePath);
+            _textParser.ParseDeviceOrder(noteText);
+            _apiClient.PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order => order.Device == "CPAP"));
+        });
+
         await _fileReader.Received(1).ReadTextAsync(filePath);
         _textParser.Received(1).ParseDeviceOrder(noteText);
         await _textParser.DidNotReceive().ParseDeviceOrderAsync(Arg.Any<string>());
-        await _apiClient.Received(1).PostDeviceOrderAsync(expectedOrder);
+        await _apiClient.Received(1).PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order =>
+            order.Device == "CPAP" &&
+            order.Device == expectedOrder.Device));
+
+        // Verify no unexpected calls were made
+        await _apiClient.DidNotReceive().PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order => order.Device != "CPAP"));
+        _textParser.DidNotReceive().ParseDeviceOrder(Arg.Is<string>(text => text != noteText));
+        await _fileReader.DidNotReceive().ReadTextAsync(Arg.Is<string>(path => path != filePath));
     }
 
     [Fact]
@@ -86,9 +105,23 @@ public class DeviceExtractorTests
         var result = await extractorWithKey.ProcessNoteAsync(filePath);
 
         Assert.Equal("CPAP", result.Device);
+        Received.InOrder(() =>
+        {
+            _fileReader.ReadTextAsync(filePath);
+            _textParser.ParseDeviceOrderAsync(noteText);
+            _apiClient.PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order => order.Device == "CPAP"));
+        });
+
         await _fileReader.Received(1).ReadTextAsync(filePath);
         await _textParser.Received(1).ParseDeviceOrderAsync(noteText);
         _textParser.DidNotReceive().ParseDeviceOrder(Arg.Any<string>());
-        await _apiClient.Received(1).PostDeviceOrderAsync(expectedOrder);
+        await _apiClient.Received(1).PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order =>
+            order.Device == "CPAP" &&
+            order.Device == expectedOrder.Device));
+
+        // Verify no unexpected calls were made
+        await _apiClient.DidNotReceive().PostDeviceOrderAsync(Arg.Is<DeviceOrder>(order => order.Device != "CPAP"));
+        await _textParser.DidNotReceive().ParseDeviceOrderAsync(Arg.Is<string>(text => text != noteText));
+        await _fileReader.DidNotReceive().ReadTextAsync(Arg.Is<string>(path => path != filePath));
     }
 }
