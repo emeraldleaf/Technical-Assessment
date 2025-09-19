@@ -1,0 +1,28 @@
+﻿[
+  {
+    ExtractedDevice: Oxygen Tank,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 1,
+    ExtractedDevice: Oxygen Tank,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 2,
+    ExtractedDevice: Oxygen Tank,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  }
+]

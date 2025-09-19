@@ -1,0 +1,36 @@
+﻿{
+  RegexResult: {
+    Device: CPAP,
+    Diagnosis: Severe sleep apnea,
+    OrderingProvider: Dr. Foreman,
+    PatientName: Lisa Turner,
+    Dob: Date_1,
+    MaskType: full face,
+    AddOns: [
+      humidifier
+    ],
+    Qualifier: AHI > 20
+  },
+  AIResult: {
+    Device: CPAP,
+    Diagnosis: Severe sleep apnea,
+    OrderingProvider: Dr. Foreman,
+    PatientName: Lisa Turner,
+    Dob: Date_1,
+    MaskType: full face,
+    AddOns: [
+      humidifier
+    ],
+    Qualifier: AHI > 20
+  },
+  ComparisonMetrics: {
+    DeviceMatch: true,
+    PatientMatch: true,
+    ProviderMatch: true,
+    AIEnhancement: {
+      MoreDetailedDiagnosis: false,
+      ExtractedMaskType: true,
+      ExtractedAddOns: true
+    }
+  }
+}
