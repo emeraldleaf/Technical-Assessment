@@ -1,9 +1,0 @@
-{
-  "device": "CPAP",
-  "ordering_provider": "Dr. Cameron",
-  "mask_type": "full face",
-  "add_ons": [
-    "humidifier"
-  ],
-  "qualifier": "AHI \u003E 20"
-}

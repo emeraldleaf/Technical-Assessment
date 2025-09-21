@@ -37,6 +37,7 @@ public class PerformanceTests
     private readonly ITestOutputHelper _output;
     private readonly TextParser _regexParser;
     private readonly IFileReader _fileReader = Substitute.For<IFileReader>();
+    private readonly IAgenticExtractor _agenticExtractor = Substitute.For<IAgenticExtractor>();
     private readonly IApiClient _apiClient = Substitute.For<IApiClient>();
 
     public PerformanceTests(ITestOutputHelper output)
@@ -69,7 +70,7 @@ public class PerformanceTests
             Api = new ApiOptions { EnableApiPosting = false }
         });
 
-        var extractor = new DeviceExtractor(_fileReader, _regexParser, _apiClient, options, 
+        var extractor = new DeviceExtractor(_fileReader, _regexParser, _agenticExtractor, _apiClient, options,
             Substitute.For<ILogger<DeviceExtractor>>());
 
         // Act - Measure batch processing time
@@ -157,7 +158,7 @@ public class PerformanceTests
             Api = new ApiOptions { EnableApiPosting = false }
         });
 
-        var extractor = new DeviceExtractor(_fileReader, _regexParser, _apiClient, options,
+        var extractor = new DeviceExtractor(_fileReader, _regexParser, _agenticExtractor, _apiClient, options,
             Substitute.For<ILogger<DeviceExtractor>>());
 
         // Act

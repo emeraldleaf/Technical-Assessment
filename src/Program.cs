@@ -197,6 +197,7 @@ class Program
                 // Core Business Logic Services (Scoped for request isolation)
                 services.AddScoped<IFileReader, FileReader>();     // File I/O operations
                 services.AddScoped<ITextParser, TextParser>();     // LLM and regex parsing
+                services.AddScoped<IAgenticExtractor, AgenticExtractor>(); // Advanced agentic AI extraction
                 services.AddScoped<DeviceExtractor>();             // Main orchestration service
                 
                 // Optional Application Insights Telemetry

@@ -38,6 +38,7 @@ public class SnapshotRegressionTests
     private readonly IFileReader _fileReader = Substitute.For<IFileReader>();
     private readonly TextParser _realParser; // Use real parser for integration testing
     private readonly TextParser? _aiParser; // AI-enabled parser for comparison testing
+    private readonly IAgenticExtractor _agenticExtractor = Substitute.For<IAgenticExtractor>();
     private readonly IApiClient _apiClient = Substitute.For<IApiClient>();
     private readonly ILogger<DeviceExtractor> _logger = Substitute.For<ILogger<DeviceExtractor>>();
     private readonly DeviceExtractor _extractor;
@@ -55,7 +56,7 @@ public class SnapshotRegressionTests
 
         _realParser = new TextParser(regexOptions, Substitute.For<ILogger<TextParser>>());
         _apiClient.PostDeviceOrderAsync(Arg.Any<DeviceOrder>()).Returns(Task.CompletedTask);
-        _extractor = new DeviceExtractor(_fileReader, _realParser, _apiClient, regexOptions, _logger);
+        _extractor = new DeviceExtractor(_fileReader, _realParser, _agenticExtractor, _apiClient, regexOptions, _logger);
 
         // AI-enabled parser for comparison testing
         var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
@@ -76,7 +77,7 @@ public class SnapshotRegressionTests
             });
 
             _aiParser = new TextParser(aiOptions, Substitute.For<ILogger<TextParser>>());
-            _aiExtractor = new DeviceExtractor(_fileReader, _aiParser, _apiClient, aiOptions, _logger);
+            _aiExtractor = new DeviceExtractor(_fileReader, _aiParser, _agenticExtractor, _apiClient, aiOptions, _logger);
         }
     }
 

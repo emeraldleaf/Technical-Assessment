@@ -101,7 +101,8 @@ Layered service-oriented design with dependency injection:
 
 ## Key Features
 
-- **LLM Integration**: OpenAI GPT-4o with regex fallback
+- **Advanced Agentic AI**: Multi-agent extraction system with autonomous reasoning and validation
+- **LLM Integration**: OpenAI GPT-4o with intelligent fallback strategies
 - **Multiple Formats**: Supports .txt and .json input files
 - **20+ Device Types**: CPAP, Oxygen, Hospital Beds, Wheelchairs, etc.
 - **Batch Processing**: Process entire directories
@@ -140,6 +141,14 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
       "ApiKey": "your-openai-api-key",
       "Model": "gpt-4o"
     },
+    "Extraction": {
+      "UseAgenticMode": true,
+      "ExtractionMode": "Standard",
+      "RequireValidation": false,
+      "MinConfidenceThreshold": 0.8,
+      "EnableSelfCorrection": false,
+      "MaxCorrectionAttempts": 2
+    },
     "Api": {
       "BaseUrl": "https://alert-api.com",
       "Endpoint": "/device-orders",
@@ -154,6 +163,36 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
   }
 }
 ```
+
+### Agentic AI Mode
+
+The application features an advanced multi-agent AI system for enhanced extraction accuracy:
+
+#### Extraction Modes
+- **Fast**: Single-pass extraction for quick processing
+- **Standard**: Multi-agent with validation (recommended)
+- **Thorough**: Comprehensive with multiple validation rounds
+
+#### AI Agents
+1. **Document Analyzer**: Analyzes structure and identifies key sections
+2. **Primary Extractor**: Extracts device order information with medical context
+3. **Medical Validator**: Validates medical accuracy and completeness
+4. **Confidence Assessor**: Evaluates extraction confidence and identifies uncertainties
+
+#### Configuration Options
+- `UseAgenticMode`: Enable/disable multi-agent system (falls back to simple parser)
+- `ExtractionMode`: Choose processing depth (Fast/Standard/Thorough)
+- `RequireValidation`: Enable validation step with potential self-correction
+- `MinConfidenceThreshold`: Minimum confidence for accepting results
+- `EnableSelfCorrection`: Allow agents to fix identified issues
+- `MaxCorrectionAttempts`: Limit correction iterations
+
+#### Benefits
+- **Higher Accuracy**: Multiple agents cross-validate findings
+- **Medical Context**: Specialized medical knowledge for device orders
+- **Self-Correction**: Automatic fixing of identified issues
+- **Confidence Scoring**: Per-field and overall confidence metrics
+- **Detailed Reasoning**: Complete audit trail of agent decisions
 
 ## Assignment Summary
 
