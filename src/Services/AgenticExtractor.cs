@@ -196,14 +196,22 @@ public class AgenticExtractor : IAgenticExtractor
             {
                 Name = "Primary Extraction Agent",
                 Role = "Extract device order information with medical context",
-                Instructions = @"Extract detailed device order information from the medical note. Focus on identifying:
-1. Device type (CPAP, BiPAP, Oxygen Tank, Hospital Bed, etc.)
-2. Ordering provider/physician name
-3. Patient information if available
-4. Medical specifications (liters, mask type, etc.)
-5. Diagnosis or medical justification
+                Instructions = @"Extract detailed device order information from the medical note. Return a JSON object with this exact structure:
 
-Important: Always populate the 'device_order' field with a complete JSON object containing all extracted information, even if some fields are null."
+{
+  ""device_order"": {
+    ""device"": ""[device type like CPAP, Oxygen Tank, etc.]"",
+    ""ordering_provider"": ""[doctor name]"",
+    ""patient_name"": ""[patient name if mentioned]"",
+    ""diagnosis"": ""[medical condition/justification]"",
+    ""mask_type"": ""[for CPAP devices]"",
+    ""liters"": ""[for oxygen devices]"",
+    ""usage"": ""[when/how used]"",
+    ""add_ons"": [""list"", ""of"", ""accessories"", ""like"", ""humidifier""]
+  }
+}
+
+CRITICAL: Always include add_ons array for ANY accessories mentioned (humidifiers, side rails, etc.). If no add-ons mentioned, use empty array []."
             },
             ["medical_validator"] = new AgentDefinition
             {

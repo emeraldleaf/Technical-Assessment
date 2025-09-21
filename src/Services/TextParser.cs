@@ -125,8 +125,10 @@ Return ONLY a JSON object with these fields (omit null/empty fields):
 - liters: For oxygen (""2 L"")
 - usage: When used (""sleep and exertion"")
 - mask_type: For CPAP (""full face"")
-- add_ons: Array of features ([""humidifier"", ""side rails"", ""pressure relief""])
+- add_ons: Array of accessories, features, or optional equipment mentioned. Look for items like: humidifiers, side rails, pressure relief valves, alarms, heating elements, backup batteries, custom cushions, wheels, trays, etc. Include ANY additional features, accessories, or modifications mentioned. If no add-ons are mentioned, omit this field entirely.
 - qualifier: Medical qualifiers (""AHI > 20"", ""pressure sore risk"", ""diabetes management"")
+
+IMPORTANT: For add_ons, carefully scan the entire note for any mentions of accessories, optional features, modifications, or additional equipment. Be thorough and consistent.
 
 Return valid JSON only.";
     }

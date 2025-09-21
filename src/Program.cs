@@ -117,8 +117,9 @@ class Program
                 Console.WriteLine("Device order extracted:");
                 Console.WriteLine(output);
                 
-                await File.WriteAllTextAsync("output.json", output);
-                logger.LogInformation("Output saved to output.json");
+                var outputPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "output.json");
+                await File.WriteAllTextAsync(outputPath, output);
+                logger.LogInformation("Output saved to {OutputPath}", Path.GetFullPath(outputPath));
             }
             
             Log.Information("Processing completed successfully");
