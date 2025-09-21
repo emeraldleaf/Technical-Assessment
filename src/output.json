@@ -1,9 +1,9 @@
 {
-  "device": "CPAP",
-  "diagnosis": "AHI \u003E 20",
-  "ordering_provider": "Dr. Cameron",
-  "mask_type": "full face mask",
-  "add_ons": [
-    "humidifier"
-  ]
+  "device": "portable oxygen tank",
+  "liters": "2",
+  "usage": "During sleep and exertion",
+  "diagnosis": "COPD",
+  "ordering_provider": "Dr. Cuddy",
+  "patient_name": "Harold Finch",
+  "dob": "04/12/1952"
 }

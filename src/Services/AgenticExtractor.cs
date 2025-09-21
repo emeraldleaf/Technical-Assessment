@@ -203,6 +203,7 @@ public class AgenticExtractor : IAgenticExtractor
     ""device"": ""[device type like CPAP, Oxygen Tank, etc.]"",
     ""ordering_provider"": ""[doctor name]"",
     ""patient_name"": ""[patient name if mentioned]"",
+    ""dob"": ""[patient date of birth in MM/DD/YYYY format]"",
     ""diagnosis"": ""[medical condition/justification]"",
     ""mask_type"": ""[for CPAP devices]"",
     ""liters"": ""[for oxygen devices]"",
@@ -211,7 +212,9 @@ public class AgenticExtractor : IAgenticExtractor
   }
 }
 
-CRITICAL: Always include add_ons array for ANY accessories mentioned (humidifiers, side rails, etc.). If no add-ons mentioned, use empty array []."
+CRITICAL:
+- Always include add_ons array for ANY accessories mentioned (humidifiers, side rails, etc.). If no add-ons mentioned, use empty array [].
+- Always extract the patient date of birth (DOB) if present in the note - look for patterns like 'DOB:', 'Date of Birth:', or birth dates in MM/DD/YYYY format."
             },
             ["medical_validator"] = new AgentDefinition
             {
@@ -325,9 +328,9 @@ Return only valid JSON.";
 - data_quality: Assessment of data completeness",
 
             "primary_extractor" => @"
-- device_order: Complete device order extraction in JSON format with fields: device, patient_name, dob, diagnosis, ordering_provider, liters, usage, mask_type, qualifier, add_ons
+- device_order: Complete device order extraction in JSON format with REQUIRED fields: device, patient_name, dob, diagnosis, ordering_provider, liters, usage, mask_type, qualifier, add_ons
 - extraction_certainty: Per-field certainty scores
-- missing_fields: Fields that couldn't be extracted",
+- missing_fields: Fields that couldn't be extracted (dob is REQUIRED if present in note)",
 
             "medical_validator" => @"
 - validation_issues: List of medical accuracy concerns
