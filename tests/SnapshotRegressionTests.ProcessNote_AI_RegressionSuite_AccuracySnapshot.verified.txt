@@ -1,3 +1,74 @@
-﻿{
-  Message: AI tests skipped - no API key configured
-}
+﻿[
+  {
+    TestCase: cpap.txt,
+    AIExtraction: {
+      Device: CPAP,
+      Diagnosis: Severe sleep apnea,
+      OrderingProvider: Dr. Foreman,
+      PatientName: Lisa Turner,
+      Dob: Date_1,
+      MaskType: full face,
+      AddOns: [
+        heated humidifier
+      ],
+      Qualifier: AHI > 20
+    },
+    QualityMetrics: {
+      ExtractedFieldCount: 8,
+      HasSpecificDetails: {
+        MaskType: true,
+        Liters: false,
+        Usage: false,
+        AddOns: true,
+        Qualifier: true
+      }
+    }
+  },
+  {
+    TestCase: oxygen.txt,
+    AIExtraction: {
+      Device: Oxygen Tank,
+      Liters: 2 L,
+      Usage: sleep and exertion,
+      Diagnosis: COPD,
+      OrderingProvider: Dr. Cuddy,
+      PatientName: Harold Finch,
+      Dob: Date_2
+    },
+    QualityMetrics: {
+      ExtractedFieldCount: 7,
+      HasSpecificDetails: {
+        MaskType: false,
+        Liters: true,
+        Usage: true,
+        AddOns: false,
+        Qualifier: false
+      }
+    }
+  },
+  {
+    TestCase: bed.txt,
+    AIExtraction: {
+      Device: Hospital Bed,
+      Diagnosis: Post-surgical recovery, mobility limitations,
+      OrderingProvider: Dr. Stevens,
+      PatientName: Maria Gonzalez,
+      Dob: Date_3,
+      AddOns: [
+        side rails,
+        pressure relief
+      ],
+      Qualifier: pressure sore risk
+    },
+    QualityMetrics: {
+      ExtractedFieldCount: 7,
+      HasSpecificDetails: {
+        MaskType: false,
+        Liters: false,
+        Usage: false,
+        AddOns: true,
+        Qualifier: true
+      }
+    }
+  }
+]
