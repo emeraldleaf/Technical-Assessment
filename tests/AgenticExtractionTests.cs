@@ -106,7 +106,7 @@ public class AgenticExtractionTests
 
         // Check that extraction mode was used (more flexible check)
         Assert.True(result.Metadata.AdditionalData.ContainsKey("ExtractionMode") ||
-                   result.Metadata.AdditionalData.Values.Any(v => v.ToString().Contains(mode.ToString())));
+                   result.Metadata.AdditionalData.Values.Any(v => v?.ToString()?.Contains(mode.ToString()) == true));
     }
 
     [Fact]
