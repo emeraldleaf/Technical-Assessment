@@ -1,3 +1,1 @@
-﻿{
-  Message: AI tests skipped - no API key configured
-}
+﻿
