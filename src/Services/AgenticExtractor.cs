@@ -474,18 +474,19 @@ Return only valid JSON.";
         }
 
         // Enhanced fallback: try to extract individual fields
+        var readOnlyOutputs = (IReadOnlyDictionary<string, object?>)outputs;
         return new DeviceOrder
         {
-            Device = outputs.GetValueOrDefault("device",
-                outputs.GetValueOrDefault("device_type", "Unknown")).ToString() ?? "Unknown",
-            OrderingProvider = outputs.GetValueOrDefault("ordering_provider",
-                outputs.GetValueOrDefault("provider", "Dr. Unknown")).ToString() ?? "Dr. Unknown",
-            PatientName = outputs.GetValueOrDefault("patient_name",
-                outputs.GetValueOrDefault("patient", null))?.ToString(),
-            Diagnosis = outputs.GetValueOrDefault("diagnosis", null)?.ToString(),
-            MaskType = outputs.GetValueOrDefault("mask_type", null)?.ToString(),
-            Liters = outputs.GetValueOrDefault("liters", null)?.ToString(),
-            Usage = outputs.GetValueOrDefault("usage", null)?.ToString()
+            Device = readOnlyOutputs.GetValueOrDefault("device",
+                readOnlyOutputs.GetValueOrDefault("device_type", "Unknown"))?.ToString() ?? "Unknown",
+            OrderingProvider = readOnlyOutputs.GetValueOrDefault("ordering_provider",
+                readOnlyOutputs.GetValueOrDefault("provider", "Dr. Unknown"))?.ToString() ?? "Dr. Unknown",
+            PatientName = readOnlyOutputs.GetValueOrDefault("patient_name",
+                readOnlyOutputs.GetValueOrDefault("patient", null))?.ToString(),
+            Diagnosis = readOnlyOutputs.GetValueOrDefault("diagnosis", null)?.ToString(),
+            MaskType = readOnlyOutputs.GetValueOrDefault("mask_type", null)?.ToString(),
+            Liters = readOnlyOutputs.GetValueOrDefault("liters", null)?.ToString(),
+            Usage = readOnlyOutputs.GetValueOrDefault("usage", null)?.ToString()
         };
     }
 
@@ -548,8 +549,8 @@ Return only valid JSON.";
 
         return new DeviceOrder
         {
-            Device = device,
-            OrderingProvider = orderingProvider,
+            Device = device ?? "Unknown",
+            OrderingProvider = orderingProvider ?? "Dr. Unknown",
             Diagnosis = diagnosis,
             MaskType = maskType,
             AddOns = addOns
