@@ -31,6 +31,7 @@ public class ModernDeviceExtractionTests
 {
     private readonly MockFileSystem _fileSystem = new();
     private readonly ITextParser _textParser = Substitute.For<ITextParser>();
+    private readonly IAgenticExtractor _agenticExtractor = Substitute.For<IAgenticExtractor>();
     private readonly IApiClient _apiClient = Substitute.For<IApiClient>();
     private readonly ILogger<DeviceExtractor> _logger = Substitute.For<ILogger<DeviceExtractor>>();
     private readonly DeviceExtractor _extractor;
@@ -44,7 +45,7 @@ public class ModernDeviceExtractionTests
             Api = new ApiOptions { EnableApiPosting = false } // Disable API calls in tests
         });
 
-        _extractor = new DeviceExtractor(fileReader, _textParser, _apiClient, options, _logger);
+        _extractor = new DeviceExtractor(fileReader, _textParser, _agenticExtractor, _apiClient, options, _logger);
     }
 
     [Theory]

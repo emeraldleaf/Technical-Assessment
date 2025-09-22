@@ -1,3 +1,5 @@
+using SignalBooster.Models;
+
 namespace SignalBooster.Configuration;
 
 /// <summary>
@@ -27,6 +29,9 @@ public class SignalBoosterOptions
     
     /// <summary>OpenAI LLM integration configuration</summary>
     public OpenAIOptions OpenAI { get; set; } = new();
+
+    /// <summary>Advanced agentic AI extraction configuration</summary>
+    public ExtractionOptions Extraction { get; set; } = new();
 }
 
 /// <summary>
@@ -87,4 +92,29 @@ public class OpenAIOptions
     
     /// <summary>LLM temperature (0.0 = deterministic, 1.0 = creative)</summary>
     public float Temperature { get; set; } = 0.1f;
+}
+
+/// <summary>
+/// Advanced agentic AI extraction configuration
+/// Controls multi-agent reasoning and validation behavior
+/// </summary>
+public class ExtractionOptions
+{
+    /// <summary>Enable agentic multi-agent extraction mode</summary>
+    public bool UseAgenticMode { get; set; } = false;
+
+    /// <summary>Extraction processing mode (Fast, Standard, Thorough)</summary>
+    public ExtractionMode ExtractionMode { get; set; } = ExtractionMode.Standard;
+
+    /// <summary>Require validation of extracted data</summary>
+    public bool RequireValidation { get; set; } = true;
+
+    /// <summary>Minimum confidence threshold for extraction results</summary>
+    public double MinConfidenceThreshold { get; set; } = 0.7;
+
+    /// <summary>Enable self-correction when validation fails</summary>
+    public bool EnableSelfCorrection { get; set; } = true;
+
+    /// <summary>Maximum number of self-correction attempts</summary>
+    public int MaxCorrectionAttempts { get; set; } = 2;
 }
