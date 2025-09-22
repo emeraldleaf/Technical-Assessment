@@ -36,6 +36,8 @@ jobs:
           ${{ runner.os }}-nuget-
           
     - name: Run tests
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: dotnet test --configuration Release --logger trx --results-directory TestResults --collect:"XPlat Code Coverage"
         
     - name: Upload test results
