@@ -19,7 +19,7 @@
     Dob: Date_1,
     MaskType: full face,
     AddOns: [
-      humidifier
+      heated humidifier
     ],
     Qualifier: AHI > 20
   },
