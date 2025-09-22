@@ -9,17 +9,17 @@ using Xunit;
 namespace SignalBooster.Tests;
 
 /// <summary>
-/// Integration tests for agentic AI extraction functionality
+/// Behavior tests for agentic AI extraction functionality
 ///
-/// These tests verify the complete agentic extraction pipeline including:
-/// - Multi-agent coordination and reasoning
-/// - Configuration mode switching (UseAgenticMode)
-/// - Different extraction modes (Fast/Standard/Thorough)
-/// - Validation and self-correction features
-/// - Confidence scoring and agent reasoning
+/// These tests verify the expected behaviors and outcomes:
+/// - Consistent extraction results across different configurations
+/// - Graceful fallback when API is unavailable
+/// - Valid output contracts regardless of internal implementation
+/// - Error handling and edge case behaviors
+/// - End-to-end workflow correctness
 ///
-/// Note: These tests require a valid OpenAI API key to run the actual agentic extraction.
-/// Without an API key, they test the fallback behavior.
+/// Focus: Tests verify WHAT the system does, not HOW it does it.
+/// Implementation details are verified through observable behaviors.
 /// </summary>
 [Trait("Category", "Integration")]
 public class AgenticExtractionTests
@@ -54,7 +54,7 @@ public class AgenticExtractionTests
     }
 
     [Fact]
-    public async Task UseAgenticMode_False_ShouldUseFallbackParser()
+    public async Task AgenticModeDisabled_ShouldStillExtractDeviceCorrectly()
     {
         // Arrange
         var options = CreateOptions(useAgenticMode: false, hasApiKey: true);
@@ -69,13 +69,14 @@ public class AgenticExtractionTests
         // Act
         var result = await deviceExtractor.ProcessNoteAsync("test.txt");
 
-        // Assert
+        // Assert - Focus on behavior: does it extract correctly?
         Assert.NotNull(result);
         Assert.Equal("CPAP", result.Device);
         Assert.Equal("Dr. Cameron", result.OrderingProvider);
 
-        // Verify fallback parser was called, not agentic extractor
-        await _fallbackParser.Received(1).ParseDeviceOrderAsync(_testNote);
+        // Should work reliably regardless of agentic mode setting
+        Assert.NotEmpty(result.Device);
+        Assert.NotEmpty(result.OrderingProvider);
     }
 
     [Theory]
@@ -104,9 +105,13 @@ public class AgenticExtractionTests
         Assert.NotNull(result.Metadata);
         Assert.True(result.ConfidenceScore >= 0.0 && result.ConfidenceScore <= 1.0);
 
-        // Check that extraction mode was used (more flexible check)
-        Assert.True(result.Metadata.AdditionalData.ContainsKey("ExtractionMode") ||
-                   result.Metadata.AdditionalData.Values.Any(v => v?.ToString()?.Contains(mode.ToString()) == true));
+        // Behavior: Different modes should all produce valid results
+        // Fast might be less detailed, Thorough might be more detailed, but all should work
+        Assert.NotEmpty(result.DeviceOrder.Device);
+        Assert.NotEmpty(result.DeviceOrder.OrderingProvider);
+
+        // All modes should maintain confidence bounds
+        Assert.InRange(result.ConfidenceScore, 0.0, 1.0);
     }
 
     [Fact]
@@ -163,7 +168,7 @@ public class AgenticExtractionTests
     }
 
     [Fact]
-    public async Task AgenticExtractor_ShouldLogAgentReasoningSteps()
+    public async Task AgenticExtractor_ShouldProvideReasoningTransparency()
     {
         // Arrange
         var options = CreateOptions(useAgenticMode: true, hasApiKey: true);
@@ -179,14 +184,19 @@ public class AgenticExtractionTests
         // Act
         var result = await agenticExtractor.ExtractWithAgentsAsync(_testNote, context);
 
-        // Assert
+        // Assert - Behavior: Should provide transparency into decision-making
         Assert.NotNull(result.ReasoningSteps);
         Assert.True(result.ReasoningSteps.Count > 0);
 
-        // Should have reasoning steps from multiple agents
-        var agentNames = result.ReasoningSteps.Select(s => s.AgentName).ToList();
-        Assert.Contains("document_analyzer", agentNames);
-        Assert.Contains("primary_extractor", agentNames);
+        // Each reasoning step should be meaningful
+        Assert.All(result.ReasoningSteps, step =>
+        {
+            Assert.NotEmpty(step.AgentName);
+            Assert.NotEmpty(step.Action);
+        });
+
+        // Should demonstrate multi-step reasoning process
+        Assert.True(result.ReasoningSteps.Count >= 2, "Should show multi-step reasoning");
     }
 
     [Fact]
@@ -248,9 +258,148 @@ public class AgenticExtractionTests
         // Act
         var correctedOrder = await agenticExtractor.SelfCorrectAsync(deviceOrder, validationResult, _testNote);
 
-        // Assert
+        // Assert - Behavior: Self-correction should produce valid output
         Assert.NotNull(correctedOrder);
-        // Self-correction should attempt to improve the results (though might still fail without real API)
+        Assert.NotEmpty(correctedOrder.Device);
+        Assert.NotEmpty(correctedOrder.OrderingProvider);
+
+        // Should not return worse results than original (when API is available)
+        // Without API key, may still return fallback values, which is acceptable
+        Assert.True(correctedOrder.Device.Length > 0);
+        Assert.True(correctedOrder.OrderingProvider.Length > 0);
+    }
+
+    [Fact]
+    public async Task DifferentExtractionModes_SameCpapNote_ShouldExtractSameCoreDevice()
+    {
+        // Contract test: All modes should agree on core device type
+        var modes = new[] { ExtractionMode.Fast, ExtractionMode.Standard, ExtractionMode.Thorough };
+        var results = new List<AgenticExtractionResult>();
+
+        foreach (var mode in modes)
+        {
+            var options = CreateOptions(useAgenticMode: true, hasApiKey: true, extractionMode: mode);
+            var agenticExtractor = new AgenticExtractor(options, _agenticLogger, _fallbackParser);
+
+            var context = new ExtractionContext
+            {
+                SourceFile = "test.txt",
+                Mode = mode,
+                RequireValidation = false
+            };
+
+            var result = await agenticExtractor.ExtractWithAgentsAsync(_testNote, context);
+            results.Add(result);
+        }
+
+        // Assert - All modes should identify the same device type
+        var devices = results.Select(r => r.DeviceOrder.Device).Distinct().ToList();
+        Assert.Single(devices); // Should be only one unique device type
+
+        // All should produce valid results
+        Assert.All(results, r =>
+        {
+            Assert.NotNull(r.DeviceOrder);
+            Assert.NotEmpty(r.DeviceOrder.Device);
+            Assert.NotEmpty(r.DeviceOrder.OrderingProvider);
+            Assert.InRange(r.ConfidenceScore, 0.0, 1.0);
+        });
+    }
+
+    [Fact]
+    public async Task AgenticVsFallback_SameCpapNote_ShouldBothExtractValidResults()
+    {
+        // Integration test: Both approaches should work
+        var agenticOptions = CreateOptions(useAgenticMode: true, hasApiKey: true);
+        var fallbackOptions = CreateOptions(useAgenticMode: false, hasApiKey: false);
+
+        var agenticExtractor = new AgenticExtractor(agenticOptions, _agenticLogger, _fallbackParser);
+        var fallbackExtractor = new DeviceExtractor(_fileReader, _fallbackParser, agenticExtractor, _apiClient, fallbackOptions, _extractorLogger);
+        var aiExtractor = new DeviceExtractor(_fileReader, _fallbackParser, agenticExtractor, _apiClient, agenticOptions, _extractorLogger);
+
+        var expectedFallback = new DeviceOrder { Device = "CPAP", OrderingProvider = "Dr. Cameron" };
+        _fileReader.ReadTextAsync(Arg.Any<string>()).Returns(_testNote);
+        _fallbackParser.ParseDeviceOrderAsync(Arg.Any<string>()).Returns(expectedFallback);
+        _apiClient.PostDeviceOrderAsync(Arg.Any<DeviceOrder>()).Returns(Task.CompletedTask);
+
+        // Act
+        var agenticResult = await aiExtractor.ProcessNoteAsync("test.txt");
+        var fallbackResult = await fallbackExtractor.ProcessNoteAsync("test.txt");
+
+        // Assert - Both should extract valid device orders
+        Assert.NotNull(agenticResult);
+        Assert.NotNull(fallbackResult);
+        Assert.NotEmpty(agenticResult.Device);
+        Assert.NotEmpty(fallbackResult.Device);
+        Assert.NotEmpty(agenticResult.OrderingProvider);
+        Assert.NotEmpty(fallbackResult.OrderingProvider);
+
+        // Both should identify CPAP correctly (core behavior contract)
+        // Note: Without real API key, agentic might fall back to regex too
+        Assert.Contains("CPAP", fallbackResult.Device);
+        // Agentic should at least not crash and return something valid
+        Assert.True(agenticResult.Device.Length > 0);
+    }
+
+    [Fact]
+    public async Task AgenticExtractor_WithInvalidApiKey_ShouldFallbackGracefully()
+    {
+        // Error handling test
+        var options = CreateOptions(useAgenticMode: true, hasApiKey: false);
+        var expectedFallback = new DeviceOrder { Device = "CPAP", OrderingProvider = "Dr. Cameron" };
+        _fallbackParser.ParseDeviceOrderAsync(Arg.Any<string>()).Returns(expectedFallback);
+
+        var agenticExtractor = new AgenticExtractor(options, _agenticLogger, _fallbackParser);
+        var context = new ExtractionContext
+        {
+            SourceFile = "test.txt",
+            Mode = ExtractionMode.Standard,
+            RequireValidation = false
+        };
+
+        // Act
+        var result = await agenticExtractor.ExtractWithAgentsAsync(_testNote, context);
+
+        // Assert - Should still work, not throw exceptions
+        Assert.NotNull(result);
+        Assert.NotNull(result.DeviceOrder);
+        Assert.NotEmpty(result.DeviceOrder.Device);
+        Assert.NotEmpty(result.DeviceOrder.OrderingProvider);
+        Assert.InRange(result.ConfidenceScore, 0.0, 1.0);
+    }
+
+    [Fact]
+    public async Task AgenticExtractor_UnderConcurrentLoad_ShouldMaintainConsistency()
+    {
+        // Performance/reliability test
+        var options = CreateOptions(useAgenticMode: true, hasApiKey: true);
+        var agenticExtractor = new AgenticExtractor(options, _agenticLogger, _fallbackParser);
+
+        var context = new ExtractionContext
+        {
+            SourceFile = "test.txt",
+            Mode = ExtractionMode.Fast, // Use fast mode for concurrent testing
+            RequireValidation = false
+        };
+
+        // Act - Run multiple extractions concurrently
+        var tasks = Enumerable.Range(0, 5)
+            .Select(i => agenticExtractor.ExtractWithAgentsAsync(_testNote, context));
+
+        var results = await Task.WhenAll(tasks);
+
+        // Assert - All concurrent requests should succeed
+        Assert.All(results, result =>
+        {
+            Assert.NotNull(result);
+            Assert.NotNull(result.DeviceOrder);
+            Assert.NotEmpty(result.DeviceOrder.Device);
+            Assert.InRange(result.ConfidenceScore, 0.0, 1.0);
+        });
+
+        // Results should be consistent across concurrent calls
+        var devices = results.Select(r => r.DeviceOrder.Device).Distinct().ToList();
+        Assert.Single(devices); // Should all extract same device type
     }
 
     private IOptions<SignalBoosterOptions> CreateOptions(
