@@ -1,0 +1,31 @@
+{
+  "SignalBooster": {
+    "OpenAI": {
+      "ApiKey": "your-openai-api-key-here",
+      "Model": "gpt-4o",
+      "MaxTokens": 2000,
+      "Temperature": 0.1
+    },
+    "Extraction": {
+      "UseAgenticMode": true,
+      "ExtractionMode": "Standard",
+      "RequireValidation": true,
+      "MinConfidenceThreshold": 0.8,
+      "EnableSelfCorrection": true,
+      "MaxCorrectionAttempts": 2
+    },
+    "Files": {
+      "DefaultInputPath": "physician_note.txt",
+      "SupportedExtensions": [".txt", ".json"],
+      "BatchProcessingMode": false,
+      "BatchInputDirectory": "test_notes"
+    },
+    "Api": {
+      "BaseUrl": "https://alert-api.com",
+      "Endpoint": "/device-orders",
+      "TimeoutSeconds": 30,
+      "RetryCount": 3,
+      "EnableApiPosting": true
+    }
+  }
+}
