@@ -18,7 +18,7 @@ namespace SignalBooster;
 /// SignalBooster MVP - DME (Durable Medical Equipment) Processing Application
 /// 
 /// Architecture Overview:
-/// - Clean Architecture with separation of concerns
+/// - Layered Service Architecture with separation of concerns
 /// - Dependency Injection for loose coupling and testability
 /// - Configuration-driven behavior for flexibility
 /// - Structured logging with Application Insights integration
@@ -117,8 +117,9 @@ class Program
                 Console.WriteLine("Device order extracted:");
                 Console.WriteLine(output);
                 
-                await File.WriteAllTextAsync("output.json", output);
-                logger.LogInformation("Output saved to output.json");
+                var outputPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "output.json");
+                await File.WriteAllTextAsync(outputPath, output);
+                logger.LogInformation("Output saved to {OutputPath}", Path.GetFullPath(outputPath));
             }
             
             Log.Information("Processing completed successfully");
@@ -152,9 +153,8 @@ class Program
     private static IConfiguration BuildConfiguration()
     {
         return new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)         // Base config
-            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true) // Dev overrides
             .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)   // Local overrides
             .AddEnvironmentVariables("SIGNALBOOSTER_")                                     // Production secrets
             .Build();
@@ -198,6 +198,7 @@ class Program
                 // Core Business Logic Services (Scoped for request isolation)
                 services.AddScoped<IFileReader, FileReader>();     // File I/O operations
                 services.AddScoped<ITextParser, TextParser>();     // LLM and regex parsing
+                services.AddScoped<IAgenticExtractor, AgenticExtractor>(); // Advanced agentic AI extraction
                 services.AddScoped<DeviceExtractor>();             // Main orchestration service
                 
                 // Optional Application Insights Telemetry

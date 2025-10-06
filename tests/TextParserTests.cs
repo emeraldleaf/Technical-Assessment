@@ -8,6 +8,21 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Unit tests for TextParser class - core business logic for device order extraction
+///
+/// Test Categories:
+/// - Regex pattern validation for 20+ device types
+/// - Text parsing accuracy across different note formats
+/// - Edge case handling (malformed text, missing data)
+/// - Device-specific attribute extraction (flow rates, mask types, usage patterns)
+///
+/// Test Strategy:
+/// - Real text parsing with regex (no mocking of parsing logic)
+/// - Comprehensive device type coverage (CPAP, Oxygen, Hospital Beds, etc.)
+/// - Boundary condition testing (empty strings, special characters)
+/// - Verification of extracted structured data accuracy
+/// </summary>
 [Trait("Category", "Unit")]
 public class TextParserTests
 {

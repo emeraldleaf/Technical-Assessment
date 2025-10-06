@@ -1,0 +1,28 @@
+﻿[
+  {
+    ExtractedDevice: Hospital Bed,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 1,
+    ExtractedDevice: Hospital Bed,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 2,
+    ExtractedDevice: Hospital Bed,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  }
+]

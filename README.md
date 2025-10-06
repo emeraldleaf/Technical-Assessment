@@ -13,11 +13,11 @@ A production-ready application for DME (Durable Medical Equipment) device order 
 # Build from root (using solution file)
 dotnet build SignalBooster.sln
 
-# Run with default batch processing
+# Run the application (mode determined by BatchProcessingMode setting in appsettings.json)
 dotnet run --project src
 
-# Process single file
-dotnet run --project src ../tests/test_notes/physician_note1.txt
+# Optional: Override with specific file path in single file mode
+# dotnet run --project src tests/test_notes/physician_note1.txt
 
 # Run tests
 dotnet test
@@ -27,7 +27,7 @@ dotnet test
 ```bash
 # Copy template and add your API key
 cp src/appsettings.Local.json.template src/appsettings.Local.json
-# Edit appsettings.Local.json with your OpenAI API key
+# Edit src/appsettings.Local.json with your OpenAI API key
 ```
 
 ## Sample Input/Output
@@ -55,9 +55,38 @@ Patient requires oxygen tank with 2 L flow rate for sleep and exertion.
 }
 ```
 
+## Verifying It Works
+
+### Single File Mode (Default)
+After running `dotnet run --project src tests/test_notes/physician_note1.txt`, check:
+
+- ✅ **Console shows:** `Processing completed successfully`
+- ✅ **File created:** `output.json` in project root with extracted device data
+- ✅ **Logs created:** `logs/signal-booster-YYYYMMDD.txt` with detailed processing info
+- ✅ **API simulation:** Console shows "Test environment detected - simulating API call"
+
+### Batch Mode
+To switch between modes, simply change `"BatchProcessingMode"` in `src/appsettings.json`:
+- `"BatchProcessingMode": true` - Processes all files in `BatchInputDirectory`
+- `"BatchProcessingMode": false` - Processes single file from `DefaultInputPath` (or command line override)
+
+Then run `dotnet run --project src`. Check:
+
+- ✅ **Console shows:** `Batch processing completed: Successfully processed X files`
+- ✅ **File summary:** Console lists each processed file (e.g., `✓ physician_note1 → Oxygen Tank for Harold Finch`)
+- ✅ **Logs created:** Detailed processing info for each file in `logs/`
+- ✅ **No output.json:** Batch mode only logs and posts to API (no individual output files)
+
+### Expected Data Extraction
+Both modes should extract structured data like:
+- **Device Type:** Oxygen Tank, CPAP, Hospital Bed, etc.
+- **Patient Info:** Name, DOB, diagnosis
+- **Provider:** Ordering physician name
+- **Device Details:** Flow rates, settings, usage instructions
+
 ## Architecture
 
-Clean service-oriented design with dependency injection:
+Layered service-oriented design with dependency injection:
 
 ```
 ├── Models/DeviceOrder.cs           # Data structures
@@ -72,7 +101,8 @@ Clean service-oriented design with dependency injection:
 
 ## Key Features
 
-- **LLM Integration**: OpenAI GPT-4o with regex fallback
+- **Advanced Agentic AI**: Multi-agent extraction system with autonomous reasoning and validation
+- **LLM Integration**: OpenAI GPT-4o with intelligent fallback strategies
 - **Multiple Formats**: Supports .txt and .json input files
 - **20+ Device Types**: CPAP, Oxygen, Hospital Beds, Wheelchairs, etc.
 - **Batch Processing**: Process entire directories
@@ -111,6 +141,14 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
       "ApiKey": "your-openai-api-key",
       "Model": "gpt-4o"
     },
+    "Extraction": {
+      "UseAgenticMode": true,
+      "ExtractionMode": "Standard",
+      "RequireValidation": false,
+      "MinConfidenceThreshold": 0.8,
+      "EnableSelfCorrection": false,
+      "MaxCorrectionAttempts": 2
+    },
     "Api": {
       "BaseUrl": "https://alert-api.com",
       "Endpoint": "/device-orders",
@@ -119,12 +157,42 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
       "EnableApiPosting": true
     },
     "Files": {
-      "BatchProcessingMode": true,
+      "BatchProcessingMode": false,
       "BatchInputDirectory": "../tests/test_notes"
     }
   }
 }
 ```
+
+### Agentic AI Mode
+
+The application features an advanced multi-agent AI system for enhanced extraction accuracy:
+
+#### Extraction Modes
+- **Fast**: Single-pass extraction for quick processing
+- **Standard**: Multi-agent with validation (recommended)
+- **Thorough**: Comprehensive with multiple validation rounds
+
+#### AI Agents
+1. **Document Analyzer**: Analyzes structure and identifies key sections
+2. **Primary Extractor**: Extracts device order information with medical context
+3. **Medical Validator**: Validates medical accuracy and completeness
+4. **Confidence Assessor**: Evaluates extraction confidence and identifies uncertainties
+
+#### Configuration Options
+- `UseAgenticMode`: Enable/disable multi-agent system (falls back to simple parser)
+- `ExtractionMode`: Choose processing depth (Fast/Standard/Thorough)
+- `RequireValidation`: Enable validation step with potential self-correction
+- `MinConfidenceThreshold`: Minimum confidence for accepting results
+- `EnableSelfCorrection`: Allow agents to fix identified issues
+- `MaxCorrectionAttempts`: Limit correction iterations
+
+#### Benefits
+- **Higher Accuracy**: Multiple agents cross-validate findings
+- **Medical Context**: Specialized medical knowledge for device orders
+- **Self-Correction**: Automatic fixing of identified issues
+- **Confidence Scoring**: Per-field and overall confidence metrics
+- **Detailed Reasoning**: Complete audit trail of agent decisions
 
 ## Assignment Summary
 
@@ -136,7 +204,7 @@ Edit `src/appsettings.json` or create `src/appsettings.Local.json`:
 - **Framework**: .NET 8.0 with xUnit testing
 
 ### Assignment Requirements ✅
-1. **Refactored Logic**: Clean service architecture with dependency injection
+1. **Refactored Logic**: Layered service architecture with dependency injection
 2. **Logging & Error Handling**: Structured logging with graceful LLM fallback
 3. **Unit Tests**: 89 tests across Unit, Integration, Performance categories
 4. **Clear Comments**: XML documentation throughout

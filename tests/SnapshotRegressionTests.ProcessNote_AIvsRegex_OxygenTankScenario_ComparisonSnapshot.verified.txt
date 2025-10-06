@@ -1,0 +1,25 @@
+﻿{
+  RegexResult: {
+    Device: Oxygen Tank,
+    Liters: 2 L,
+    Usage: sleep and exertion,
+    Diagnosis: COPD,
+    OrderingProvider: Dr. Cuddy,
+    PatientName: Harold Finch,
+    Dob: Date_1
+  },
+  AIResult: {
+    Device: Oxygen Tank,
+    Liters: 2 L,
+    Usage: sleep and exertion,
+    Diagnosis: COPD,
+    OrderingProvider: Dr. Cuddy,
+    PatientName: Harold Finch,
+    Dob: Date_1
+  },
+  AIEnhancements: {
+    ExtractedLiters: true,
+    ExtractedUsage: true,
+    DetailedQualifier: false
+  }
+}

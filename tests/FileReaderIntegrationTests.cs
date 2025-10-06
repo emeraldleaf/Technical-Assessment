@@ -4,6 +4,27 @@ using Xunit;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Integration tests for FileReader class with real file system operations
+///
+/// Test Categories:
+/// - Real file I/O operations with temporary files
+/// - JSON and plain text file format handling
+/// - File encoding and character set validation
+/// - Error handling for missing or corrupted files
+///
+/// Testing Approach:
+/// - Uses real FileSystem (not mocked) for true integration testing
+/// - Creates and cleans up temporary files for each test
+/// - Validates both .txt and .json file parsing
+/// - Tests actual file system error conditions (permissions, missing files)
+///
+/// File Format Support:
+/// - Plain text files: Direct content reading
+/// - JSON files: Extracts "note" property value
+/// - UTF-8 encoding support for international characters
+/// - Large file handling (>1MB) performance validation
+/// </summary>
 [Trait("Category", "Integration")]
 public class FileReaderIntegrationTests
 {

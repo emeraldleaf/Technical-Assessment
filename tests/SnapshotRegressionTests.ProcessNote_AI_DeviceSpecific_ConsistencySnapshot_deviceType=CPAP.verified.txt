@@ -1,0 +1,28 @@
+﻿[
+  {
+    ExtractedDevice: CPAP,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 1,
+    ExtractedDevice: CPAP,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  },
+  {
+    VariationIndex: 2,
+    ExtractedDevice: CPAP,
+    ConsistencyMarkers: {
+      DeviceCorrect: true,
+      HasPatientInfo: true,
+      HasProvider: true
+    }
+  }
+]

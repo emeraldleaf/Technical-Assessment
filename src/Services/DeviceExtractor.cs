@@ -15,7 +15,7 @@ namespace SignalBooster.Services;
 /// - Strategy Pattern: Supports both single-file and batch processing strategies
 /// 
 /// Architecture Role:
-/// - Application Service in Clean Architecture
+/// - Application Service in Layered Service Architecture
 /// - Coordinates between domain logic (parsing) and infrastructure (file I/O, API calls)
 /// - Handles cross-cutting concerns: logging, error handling, configuration
 /// 
@@ -29,6 +29,7 @@ public class DeviceExtractor
     // Dependencies injected via constructor (Dependency Injection Pattern)
     private readonly IFileReader _fileReader;      // File I/O abstraction
     private readonly ITextParser _textParser;      // LLM and regex parsing logic
+    private readonly IAgenticExtractor _agenticExtractor; // Advanced agentic AI extraction
     private readonly IApiClient _apiClient;        // External API communication
     private readonly SignalBoosterOptions _options; // Strongly-typed configuration
     private readonly ILogger<DeviceExtractor> _logger; // Structured logging
@@ -38,14 +39,16 @@ public class DeviceExtractor
     /// All dependencies are abstractions (interfaces) for testability and flexibility
     /// </summary>
     public DeviceExtractor(
-        IFileReader fileReader, 
+        IFileReader fileReader,
         ITextParser textParser,
+        IAgenticExtractor agenticExtractor,
         IApiClient apiClient,
         IOptions<SignalBoosterOptions> options,
         ILogger<DeviceExtractor> logger)
     {
         _fileReader = fileReader ?? throw new ArgumentNullException(nameof(fileReader));
         _textParser = textParser ?? throw new ArgumentNullException(nameof(textParser));
+        _agenticExtractor = agenticExtractor ?? throw new ArgumentNullException(nameof(agenticExtractor));
         _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -93,10 +96,50 @@ public class DeviceExtractor
                 _logger.LogInformation("[{Class}.{Method}] Step 2: Invoking text parser with {ProcessingMode} mode",
                     nameof(DeviceExtractor), nameof(ProcessNoteAsync), useOpenAI ? "OpenAI LLM" : "Regex");
                 
-                // Use async method if LLM is configured, otherwise use sync regex parser
-                var deviceOrder = useOpenAI
-                    ? await _textParser.ParseDeviceOrderAsync(noteText)
-                    : _textParser.ParseDeviceOrder(noteText);
+                // Choose extraction strategy based on configuration and requirements
+                DeviceOrder deviceOrder;
+                if (_options.Extraction?.UseAgenticMode == true)
+                {
+                    try
+                    {
+                        // Use advanced agentic extraction with multi-agent reasoning
+                        var context = new ExtractionContext
+                        {
+                            SourceFile = filePath,
+                            Mode = _options.Extraction.ExtractionMode,
+                            RequireValidation = _options.Extraction.RequireValidation
+                        };
+
+                        var agenticResult = await _agenticExtractor.ExtractWithAgentsAsync(noteText, context);
+                        deviceOrder = agenticResult?.DeviceOrder ?? new DeviceOrder();
+
+                        // Log agentic extraction results
+                        _logger.LogInformation("[{Class}.{Method}] Agentic extraction completed. Confidence: {Confidence}, Agents: {Agents}, Duration: {Duration}ms",
+                            nameof(DeviceExtractor), nameof(ProcessNoteAsync), agenticResult?.ConfidenceScore ?? 0.0,
+                            string.Join(", ", agenticResult?.Metadata?.AgentsUsed ?? new List<string>()), agenticResult?.Metadata?.ProcessingDuration.TotalMilliseconds ?? 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log agentic extraction failure and fall back to standard parser
+                        _logger.LogError(ex, "[{Class}.{Method}] Agentic extraction failed, falling back to standard parser",
+                            nameof(DeviceExtractor), nameof(ProcessNoteAsync));
+
+                        // Fall back to standard parser
+                        deviceOrder = useOpenAI
+                            ? await _textParser.ParseDeviceOrderAsync(noteText)
+                            : _textParser.ParseDeviceOrder(noteText);
+                    }
+                }
+                else
+                {
+                    // Use standard LLM or regex parser
+                    deviceOrder = useOpenAI
+                        ? await _textParser.ParseDeviceOrderAsync(noteText)
+                        : _textParser.ParseDeviceOrder(noteText);
+                }
+
+                // Ensure we always have a valid device order
+                deviceOrder ??= new DeviceOrder();
                 
                 // Log successful extraction with business metrics
                 _logger.LogInformation("[{Class}.{Method}] Step 3: Device order extracted successfully. Device: {DeviceType}, Patient: {PatientName}, Provider: {Provider}, ParseDuration: {ProcessingDurationMs}ms",
@@ -216,11 +259,14 @@ public class DeviceExtractor
         }
 
         // File discovery using configurable extensions
-        var files = new List<string>();
+        var files = new HashSet<string>();
         foreach (var extension in _options.Files.SupportedExtensions)
         {
             var pattern = $"*{extension}";
-            files.AddRange(Directory.GetFiles(inputDirectory, pattern));
+            foreach (var file in Directory.GetFiles(inputDirectory, pattern))
+            {
+                files.Add(file);
+            }
         }
 
         // Deterministic ordering for consistent batch processing

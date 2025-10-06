@@ -61,23 +61,22 @@ All tests pass - system is working correctly
 - **Snapshot Tests**: May show "failures" on very first run to create baseline `.verified.txt` files
 - **Normal**: These files are created once, then subsequent runs compare against them
 
-### Batch Processing Mode (Default)
+### Run Application (Mode determined by appsettings.json)
 
 **Unix/Linux/macOS:**
 ```bash
-# Run application (must be from src directory for config files)
-cd src && dotnet run
+# Run application (BatchProcessingMode: true by default)
+dotnet run --project src
 
-# Expected: Processes test files, generates JSON outputs
+# Expected: Processes all files in tests/test_notes directory
 ```
 
 **Windows:**
 ```cmd
-REM Run application (must be from src directory for config files)
-cd src
-dotnet run
+REM Run application (BatchProcessingMode: true by default)
+dotnet run --project src
 
-REM Expected: Processes test files, generates JSON outputs
+REM Expected: Processes all files in tests/test_notes directory
 ```
 
 ---
@@ -86,36 +85,34 @@ REM Expected: Processes test files, generates JSON outputs
 
 ### Single File Processing
 
-**Method 1: Environment Variable Override (Recommended)**
+**Method 1: Edit appsettings.json (Recommended)**
 ```bash
-# Unix/Linux/macOS
-cd src && SIGNALBOOSTER_Files__BatchProcessingMode=false dotnet run ../tests/test_notes/physician_note1.txt
+# Edit src/appsettings.json and change:
+# "BatchProcessingMode": false
 
-# Windows Command Prompt
-cd src
-set SIGNALBOOSTER_Files__BatchProcessingMode=false
-dotnet run ../tests/test_notes/physician_note1.txt
+# Then run with optional file override
+dotnet run --project src tests/test_notes/physician_note1.txt
 
-# Windows PowerShell
-cd src
-$env:SIGNALBOOSTER_Files__BatchProcessingMode="false"
-dotnet run ../tests/test_notes/physician_note1.txt
+# Or run with configured DefaultInputPath
+dotnet run --project src
 
 # Check output
 cat output.json        # Unix/Linux/macOS
 type output.json       # Windows
 ```
 
-**Method 2: Configuration Override**
+**Method 2: Environment Variable Override**
 ```bash
-# Create local config override
-echo '{"SignalBooster":{"Files":{"BatchProcessingMode":false}}}' > src/appsettings.Local.json
+# Unix/Linux/macOS
+SIGNALBOOSTER_Files__BatchProcessingMode=false dotnet run --project src tests/test_notes/physician_note1.txt
+
+# Windows Command Prompt
+set SIGNALBOOSTER_Files__BatchProcessingMode=false
+dotnet run --project src tests/test_notes/physician_note1.txt
 
 # Windows PowerShell
-'{"SignalBooster":{"Files":{"BatchProcessingMode":false}}}' | Out-File -FilePath src/appsettings.Local.json
-
-# Then run normally
-cd src && dotnet run ../tests/test_notes/physician_note1.txt
+$env:SIGNALBOOSTER_Files__BatchProcessingMode="false"
+dotnet run --project src tests/test_notes/physician_note1.txt
 ```
 
 **Expected Output:**

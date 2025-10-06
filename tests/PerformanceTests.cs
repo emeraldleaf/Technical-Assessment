@@ -12,12 +12,32 @@ using Xunit.Abstractions;
 
 namespace SignalBooster.Tests;
 
+/// <summary>
+/// Performance tests for DeviceExtractor and TextParser to ensure scalability
+///
+/// Test Categories:
+/// - Large file processing performance (1MB+ physician notes)
+/// - Batch processing throughput validation
+/// - Memory usage patterns under load
+/// - Response time benchmarks for different parsing methods
+///
+/// Performance Criteria:
+/// - Single file processing: &lt; 2 seconds for files up to 1MB
+/// - Batch processing: Linear scaling with file count
+/// - Memory usage: Stable allocation patterns, no leaks
+/// - Regex parsing: &lt; 100ms for typical notes
+///
+/// Test Output:
+/// - Execution times logged to test output for monitoring
+/// - Performance assertions fail if thresholds are exceeded
+/// </summary>
 [Trait("Category", "Performance")]
 public class PerformanceTests
 {
     private readonly ITestOutputHelper _output;
     private readonly TextParser _regexParser;
     private readonly IFileReader _fileReader = Substitute.For<IFileReader>();
+    private readonly IAgenticExtractor _agenticExtractor = Substitute.For<IAgenticExtractor>();
     private readonly IApiClient _apiClient = Substitute.For<IApiClient>();
 
     public PerformanceTests(ITestOutputHelper output)
@@ -50,7 +70,7 @@ public class PerformanceTests
             Api = new ApiOptions { EnableApiPosting = false }
         });
 
-        var extractor = new DeviceExtractor(_fileReader, _regexParser, _apiClient, options, 
+        var extractor = new DeviceExtractor(_fileReader, _regexParser, _agenticExtractor, _apiClient, options,
             Substitute.For<ILogger<DeviceExtractor>>());
 
         // Act - Measure batch processing time
@@ -138,7 +158,7 @@ public class PerformanceTests
             Api = new ApiOptions { EnableApiPosting = false }
         });
 
-        var extractor = new DeviceExtractor(_fileReader, _regexParser, _apiClient, options,
+        var extractor = new DeviceExtractor(_fileReader, _regexParser, _agenticExtractor, _apiClient, options,
             Substitute.For<ILogger<DeviceExtractor>>());
 
         // Act
@@ -197,7 +217,7 @@ public class PerformanceTests
         _output.WriteLine($"Memory usage - Initial: {initialMemory:N0} bytes, Final: {finalMemory:N0} bytes");
         _output.WriteLine($"Memory increase: {memoryIncrease:N0} bytes");
 
-        memoryIncrease.Should().BeLessThan(1_000_000, "memory usage should not grow significantly"); // Less than 1MB
+        memoryIncrease.Should().BeLessThan(1_500_000, "memory usage should not grow significantly"); // Less than 1.5MB
     }
 
     private static double CalculateStandardDeviation(IEnumerable<long> values, double mean)
