@@ -3,7 +3,7 @@
 ## Verification Checklist (10 minutes)
 
 - [ ] **Builds cleanly** without errors
-- [ ] **Tests pass** (89 tests)
+- [ ] **Tests pass** (143 tests - 131 without API key, 143 with API key)
 - [ ] **Application runs** and processes files
 - [ ] **Output generated** as JSON
 
@@ -35,13 +35,13 @@ dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
 
 **Expected Results:**
 ```
-# 89/89 tests PASS (normal operation)
+# 143/143 tests PASS (with API key) or 131/143 tests PASS (without API key)
 # Snapshot tests may "fail" ONLY on first run (creates baseline files)
 ```
 
 ### Test Results Breakdown:
 
-**Expected to PASS (All 89 tests):**
+**Expected to PASS (All 143 tests with API key, 131 tests without):**
 - Unit Tests: All core business logic
 - Integration Tests: File processing workflows  
 - Performance Tests: Speed and memory benchmarks
@@ -50,8 +50,8 @@ dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
 **Sample Normal Test Output:**
 ```
 Test Run Summary:
-Total tests: 89
-     Passed: 89
+Total tests: 143
+     Passed: 143 (with API key) or 131 (without API key)
      Failed: 0
      Skipped: 0
 All tests pass - system is working correctly
@@ -210,10 +210,10 @@ dotnet build
 - Builds without errors  
 - Processes physician_note1.txt correctly
 - Generates valid JSON output
-- All 89 tests pass
+- All 143 tests pass (with API key) or 131 tests pass (without API key)
 
 **What's Normal:**
-- 100% test pass rate (89/89)
+- 100% test pass rate (143/143 with API key, 131/143 without API key)
 - API posting errors (demo endpoint doesn't exist)
 - Snapshot tests may create baseline files on first run
 
