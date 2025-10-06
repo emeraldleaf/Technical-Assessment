@@ -108,7 +108,7 @@ Layered service-oriented design with dependency injection:
 - **Batch Processing**: Process entire directories
 - **Fault Tolerance**: API retry logic with exponential backoff
 - **Performance Optimized**: StreamReader for large files (>1MB)
-- **Comprehensive Testing**: 89 tests across 5 categories (100% pass rate)
+- **Comprehensive Testing**: 143 tests across multiple categories (100% pass rate)
 - **Production Ready**: Structured logging, error handling, observability
 
 ## Testing
@@ -120,7 +120,7 @@ dotnet test
 # Run tests with coverage (matches CI pipeline)
 dotnet test --configuration Release --logger trx --collect:"XPlat Code Coverage"
 
-# Expected: All 89 tests pass (100% success rate)
+# Expected: All 143 tests pass (100% success rate)
 
 # Run by category
 dotnet test --filter "Category=Unit"
@@ -206,7 +206,7 @@ The application features an advanced multi-agent AI system for enhanced extracti
 ### Assignment Requirements ✅
 1. **Refactored Logic**: Layered service architecture with dependency injection
 2. **Logging & Error Handling**: Structured logging with graceful LLM fallback
-3. **Unit Tests**: 89 tests across Unit, Integration, Performance categories
+3. **Unit Tests**: 143 tests across Unit, Integration, Performance, and Coverage categories
 4. **Clear Comments**: XML documentation throughout
 5. **Functional**: Reads files, extracts data, POSTs to API
 6. **Bonus Features**: LLM integration, multiple formats, 20+ device types
@@ -280,7 +280,7 @@ ENTRYPOINT ["dotnet", "SignalBooster.dll"]
 
 ### GitHub Actions Setup
 The repository includes a complete CI/CD pipeline (`.github/workflows/ci.yml`) that:
-- Runs **424 comprehensive tests** on every push/PR
+- Runs **143 comprehensive tests** on every push/PR
 - Generates **code coverage reports** (currently 73% line coverage)
 - Builds and deploys artifacts for production
 - Supports both **regex-only** and **OpenAI-enhanced** testing modes
@@ -305,8 +305,8 @@ To enable full CI/CD functionality including OpenAI-enhanced tests:
    ```
 
 ### Test Execution in CI/CD
-- **Without API Key**: 421/424 tests pass (AI tests gracefully skipped)
-- **With API Key**: All 424 tests execute with full OpenAI integration
+- **Without API Key**: ~140/143 tests pass (AI snapshot tests gracefully skipped)
+- **With API Key**: All 143 tests execute with full OpenAI integration
 - **Security**: No hardcoded secrets - all handled via GitHub secrets
 
 ### Pipeline Triggers

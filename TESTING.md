@@ -177,8 +177,8 @@ To enable full test execution including AI-enhanced tests in GitHub Actions:
    ```
 
 #### Test Execution Modes in CI/CD
-- **Without GitHub Secret**: 421/424 tests pass (AI tests gracefully skip)
-- **With GitHub Secret**: All 424 tests execute with full OpenAI integration
+- **Without GitHub Secret**: ~140/143 tests pass (AI snapshot tests gracefully skip)
+- **With GitHub Secret**: All 143 tests execute with full OpenAI integration
 - **Security**: No API keys in code - all handled via GitHub secrets management
 
 ### API Key Handling
