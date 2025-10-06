@@ -158,6 +158,29 @@ dotnet test --filter "ProcessNote_AI"
 - **Coverage**: xPlat Code Coverage with Cobertura reports
 - **Artifacts**: Test results (TRX) and coverage reports
 
+#### Setting Up GitHub Secrets for CI/CD
+To enable full test execution including AI-enhanced tests in GitHub Actions:
+
+1. **Repository Settings**:
+   - Navigate to: `Settings` → `Secrets and variables` → `Actions`
+
+2. **Add Repository Secret**:
+   ```
+   Name: OPENAI_API_KEY
+   Value: sk-proj-[your-openai-api-key-here]
+   ```
+
+3. **Workflow Configuration** (already configured):
+   ```yaml
+   env:
+     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+   ```
+
+#### Test Execution Modes in CI/CD
+- **Without GitHub Secret**: 421/424 tests pass (AI tests gracefully skip)
+- **With GitHub Secret**: All 424 tests execute with full OpenAI integration
+- **Security**: No API keys in code - all handled via GitHub secrets management
+
 ### API Key Handling
 - **With API Key**: Tests run full AI extraction pipeline
 - **Without API Key**: Tests verify graceful fallback to regex parsing

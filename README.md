@@ -276,6 +276,44 @@ WORKDIR /app
 ENTRYPOINT ["dotnet", "SignalBooster.dll"]
 ```
 
+## CI/CD Pipeline
+
+### GitHub Actions Setup
+The repository includes a complete CI/CD pipeline (`.github/workflows/ci.yml`) that:
+- Runs **424 comprehensive tests** on every push/PR
+- Generates **code coverage reports** (currently 73% line coverage)
+- Builds and deploys artifacts for production
+- Supports both **regex-only** and **OpenAI-enhanced** testing modes
+
+### Required GitHub Secrets
+To enable full CI/CD functionality including OpenAI-enhanced tests:
+
+1. **Navigate to Repository Settings**:
+   - Go to `https://github.com/[your-org]/[your-repo]/settings/secrets/actions`
+
+2. **Add OpenAI API Key Secret**:
+   ```
+   Name: OPENAI_API_KEY
+   Value: sk-proj-[your-openai-api-key]
+   ```
+
+3. **Workflow Environment Variables**:
+   The CI/CD pipeline automatically uses the secret:
+   ```yaml
+   env:
+     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+   ```
+
+### Test Execution in CI/CD
+- **Without API Key**: 421/424 tests pass (AI tests gracefully skipped)
+- **With API Key**: All 424 tests execute with full OpenAI integration
+- **Security**: No hardcoded secrets - all handled via GitHub secrets
+
+### Pipeline Triggers
+- **Push to main/develop**: Full test suite + deployment
+- **Pull Requests**: Test suite validation
+- **Manual Dispatch**: On-demand pipeline execution
+
 ---
 
 **Ready for Production** ✅
