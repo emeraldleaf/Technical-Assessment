@@ -6,17 +6,32 @@ This document describes the testing strategy and architecture for the SignalBoos
 
 ## Testing Philosophy
 
-### Behavior-First Testing
+### Hybrid Testing Approach
+The test suite uses a **pragmatic blend** of testing strategies to ensure both business value and code quality:
+
+#### 1. Behavior-First Testing (Primary)
 - **Test WHAT the system does, not HOW it does it**
 - Focus on observable outcomes and user value
 - Verify contracts and business requirements
 - Maintain test validity across refactoring
 
+#### 2. Coverage-Driven Testing (Secondary)
+- **Ensure critical code paths are exercised**
+- Test error handling and edge cases
+- Validate async method behaviors
+- Achieve measurable coverage targets (70%+ line coverage)
+
+#### 3. Integration Testing (Essential)
+- **Verify system-wide behavior**
+- Test OpenAI API integration scenarios
+- Validate configuration and dependency injection
+- Ensure graceful fallback mechanisms work
+
 ### Anti-Patterns Avoided
-- ❌ Testing implementation details (which parser was called)
-- ❌ Mocking verification calls (`Received(1)`)
-- ❌ Testing internal metadata structures
-- ❌ Brittle tests that break on refactoring
+- ❌ Over-mocking that obscures real behavior
+- ❌ Testing trivial getters/setters without business logic
+- ❌ Brittle tests that break on harmless refactoring
+- ❌ Coverage tests that don't add business value
 
 ## Test Categories
 
