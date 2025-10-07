@@ -200,7 +200,7 @@ The application features an advanced multi-agent AI system for enhanced extracti
 
 ### Tools Used
 - **IDE**: VS Code with C# extension
-- **AI Tools**: Claude Code, GitHub Copilot
+- **AI Tools**: Claude Code, GitHub Copilot, Codacy
 - **Framework**: .NET 8.0 with xUnit testing
 
 ### Assignment Requirements ✅
@@ -315,5 +315,6 @@ To enable full CI/CD functionality including OpenAI-enhanced tests:
 - **Manual Dispatch**: On-demand pipeline execution
 
 ---
+
 
 **Ready for Production** ✅
